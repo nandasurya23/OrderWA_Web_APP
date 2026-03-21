@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LogIn } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -28,6 +29,7 @@ type LoginFormProps = {
 
 export function LoginForm({ nextPath }: LoginFormProps) {
   const router = useRouter();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const redirectPath =
     nextPath && nextPath.startsWith("/") ? nextPath : "/seller/setup";
   const {
@@ -45,6 +47,7 @@ export function LoginForm({ nextPath }: LoginFormProps) {
   });
 
   const onSubmit = handleSubmit(async (values) => {
+    setSubmitError(null);
     try {
       await loginSeller(values);
       toast.success("Berhasil masuk");
@@ -56,16 +59,27 @@ export function LoginForm({ nextPath }: LoginFormProps) {
           setError("email", { message: error.fieldErrors.email });
         }
 
+        setSubmitError(error.message);
         toast.error(error.message);
         return;
       }
 
+      setSubmitError("Gagal masuk. Coba lagi.");
       toast.error("Gagal masuk. Coba lagi.");
     }
   });
 
   return (
     <form className="space-y-5" onSubmit={onSubmit} noValidate>
+      <div className="space-y-2">
+        <h2 className="text-3xl font-semibold leading-tight tracking-[-0.04em] text-[var(--foreground)]">
+          Masuk ke workspace seller
+        </h2>
+        <p className="max-w-[42ch] text-sm leading-7 text-[var(--foreground-muted)]">
+          Gunakan email dan kata sandi yang sudah terdaftar untuk lanjut ke setup.
+        </p>
+      </div>
+
       <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -89,7 +103,7 @@ export function LoginForm({ nextPath }: LoginFormProps) {
               href="/auth/register"
               className="text-sm text-[var(--foreground-muted)] transition-colors duration-200 hover:text-[var(--accent)]"
             >
-              Belum punya akun?
+              Buat akun baru
             </Link>
           </div>
           <FieldControl>
@@ -105,6 +119,12 @@ export function LoginForm({ nextPath }: LoginFormProps) {
         </Field>
       </div>
 
+      {submitError ? (
+        <div className="rounded-[1.2rem] border border-[var(--danger)] bg-[var(--danger-muted)] px-4 py-3 text-sm leading-6 text-[var(--danger)]">
+          {submitError}
+        </div>
+      ) : null}
+
       <Button
         size="large"
         type="submit"
@@ -114,7 +134,7 @@ export function LoginForm({ nextPath }: LoginFormProps) {
         loadingText="Sedang masuk..."
       >
         <LogIn aria-hidden="true" className="h-4 w-4" />
-        Masuk
+        Masuk ke Dashboard
       </Button>
     </form>
   );

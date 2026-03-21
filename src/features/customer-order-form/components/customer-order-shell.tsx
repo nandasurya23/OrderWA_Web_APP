@@ -19,27 +19,41 @@ import type {
 
 type CustomerOrderShellProps = {
   config: SellerOrderConfig | null;
+  invalidLinkCode?: "LINK_EXPIRED" | "LINK_INACTIVE" | "LINK_NOT_FOUND" | "UNKNOWN" | null;
   invalidLinkReason?: string | null;
 };
 
 export function CustomerOrderShell({
   config,
+  invalidLinkCode,
   invalidLinkReason,
 }: CustomerOrderShellProps) {
   const [generatedMessage, setGeneratedMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   if (!config) {
+    const stateLabel =
+      invalidLinkCode === "LINK_EXPIRED"
+        ? "Link Kedaluwarsa"
+        : invalidLinkCode === "LINK_INACTIVE"
+        ? "Link Dinonaktifkan"
+        : invalidLinkCode === "LINK_NOT_FOUND"
+        ? "Link Tidak Ditemukan"
+        : "Link Tidak Valid";
+
     return (
       <Card className="space-y-4 rounded-[2rem]">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-muted)]">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--danger-muted)]">
             <TriangleAlert
               aria-hidden="true"
-              className="h-4 w-4 text-[var(--accent)]"
+              className="h-4 w-4 text-[var(--danger)]"
             />
           </div>
           <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
+              {stateLabel}
+            </p>
             <h2 className="text-2xl font-semibold leading-tight tracking-[-0.03em] text-[var(--foreground)]">
               Link form tidak bisa dibuka
             </h2>
@@ -47,6 +61,11 @@ export function CustomerOrderShell({
               {invalidLinkReason ??
                 "Link ini tidak lengkap atau sudah rusak. Minta seller mengirim link form yang baru."}
             </p>
+            <div className="pt-2">
+              <Button href="/" size="default" variant="secondary">
+                Kembali ke Homepage
+              </Button>
+            </div>
           </div>
         </div>
       </Card>

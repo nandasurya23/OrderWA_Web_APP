@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3f5f9;
+  --background: #f2f5fa;
   --surface: #ffffff;
-  --surface-muted: #f4f7fb;
-  --surface-elevated: rgba(255, 255, 255, 0.78);
-  --foreground: #10233c;
-  --foreground-muted: #617287;
-  --border: #d9e1ea;
-  --border-strong: #bccbda;
-  --border-soft: rgba(188, 203, 218, 0.64);
-  --accent: #133c70;
+  --surface-muted: #f6f8fc;
+  --surface-elevated: rgba(255, 255, 255, 0.82);
+  --foreground: #0e223d;
+  --foreground-muted: #5f7288;
+  --border: #d6dfeb;
+  --border-strong: #b7c6d8;
+  --border-soft: rgba(181, 198, 219, 0.58);
+  --accent: #0f3a72;
   --accent-foreground: #f6f9ff;
-  --accent-muted: #e7eef8;
-  --ring: rgba(19, 60, 112, 0.18);
-  --danger: #b24c4f;
+  --accent-muted: #e6effb;
+  --ring: rgba(15, 58, 114, 0.18);
+  --danger: #b7484c;
+  --danger-muted: rgba(183, 72, 76, 0.1);
+  --success: #236c49;
+  --shadow-soft: 0 24px 64px rgba(10, 31, 58, 0.08);
+  --shadow-strong: 0 30px 84px rgba(8, 30, 58, 0.14);
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
-  --shadow-soft: 0 24px 70px rgba(13, 34, 63, 0.08);
+  --field-height: 3rem;
+  --max-text-measure: 62ch;
 }
 
 * {
@@ -35,9 +40,10 @@ body {
   background:
     radial-gradient(circle at top left, rgba(19, 60, 112, 0.08), transparent 28%),
     radial-gradient(circle at top right, rgba(24, 82, 150, 0.06), transparent 24%),
-    linear-gradient(180deg, #f8fbff 0%, var(--background) 32%, #eef2f7 100%);
+    linear-gradient(180deg, #f8fbff 0%, var(--background) 32%, #eef3f9 100%);
   color: var(--foreground);
   font-feature-settings: "rlig" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
 }
 
 body,
@@ -79,6 +85,17 @@ button:disabled {
 :focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ::selection {

@@ -26,7 +26,7 @@ export function FieldLabel({
 export function FieldHint({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-sm leading-6 text-[var(--foreground-muted)]", className)}
+      className={cn("text-xs leading-5 text-[var(--foreground-muted)] sm:text-sm sm:leading-6", className)}
       {...props}
     />
   );
@@ -38,7 +38,7 @@ export function FieldError({
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-sm leading-6 text-[var(--danger)]", className)}
+      className={cn("text-xs font-medium leading-5 text-[var(--danger)] sm:text-sm sm:leading-6", className)}
       {...props}
     />
   );

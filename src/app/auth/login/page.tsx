@@ -21,12 +21,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <SectionContainer>
           <FadeIn>
             <AuthShell
-              description="Masuk untuk mengatur format order, melihat profil seller, dan membagikan link form ke customer."
+              description="Masuk untuk lanjut ke profile dan setup order flow tanpa mengubah alur kerja utama."
               eyebrow="Login Seller"
               footerCopy="Belum punya akun?"
               footerHref={nextPath ? `/auth/register?next=${encodeURIComponent(nextPath)}` : "/auth/register"}
               footerLinkLabel="Daftar di sini"
-              title="Masuk ke akun seller"
+              title="Login seller yang lebih cepat"
             >
               <LoginForm nextPath={nextPath} />
             </AuthShell>

@@ -18,7 +18,7 @@ export function Checkbox({
   return (
     <label
       className={cn(
-        "group flex cursor-pointer items-start gap-4 rounded-[1.35rem] border border-[var(--border)] bg-[rgba(255,255,255,0.82)] px-4 py-4 transition-[border-color,background-color,box-shadow] duration-200 hover:border-[var(--border-strong)] hover:bg-[var(--surface)]",
+        "group flex cursor-pointer items-start gap-4 rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.86)] px-4 py-4 transition-[border-color,background-color,box-shadow] duration-200 hover:border-[var(--border-strong)] hover:bg-[var(--surface)]",
         className,
       )}
     >
@@ -26,7 +26,7 @@ export function Checkbox({
         <input
           type="checkbox"
           checked={checked}
-          className="peer absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-md border border-[var(--border-strong)] bg-[var(--surface)] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] transition-[border-color,background-color,box-shadow] duration-200 checked:border-[var(--accent)] checked:bg-[linear-gradient(135deg,#163e73_0%,#0f2f57_100%)] focus-visible:outline-none"
+          className="peer absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-md border border-[var(--border-strong)] bg-[var(--surface)] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] transition-[border-color,background-color,box-shadow] duration-200 checked:border-[var(--accent)] checked:bg-[linear-gradient(140deg,#14437d_0%,#0d2f59_100%)] focus-visible:outline-none focus-visible:shadow-[0_0_0_4px_rgba(15,58,114,0.11)]"
           {...props}
         />
         <Check

@@ -170,6 +170,27 @@ export function SellerOrderBuilderShell() {
           </Field>
         </div>
 
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
+              Status link
+            </p>
+            <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
+              {canGenerateLink ? "Siap generate link baru" : "Masih dalam cooldown free plan"}
+            </p>
+          </div>
+          <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
+              Next available
+            </p>
+            <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
+              {nextAvailableAt
+                ? new Date(nextAvailableAt).toLocaleString("id-ID")
+                : "Sekarang"}
+            </p>
+          </div>
+        </div>
+
         {!normalizedDestinationPhoneNumber ? (
           <div className="rounded-[1.35rem] border border-[var(--border)] bg-[var(--surface-muted)] px-4 py-4 text-sm leading-6 text-[var(--foreground-muted)]">
             Lengkapi dulu nomor WhatsApp tujuan di{" "}

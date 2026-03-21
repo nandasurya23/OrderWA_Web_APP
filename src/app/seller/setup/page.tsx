@@ -6,7 +6,7 @@ export default function SellerSetupPage() {
   return (
     <div className="py-12 sm:py-16">
       <SectionContainer className="space-y-10">
-        <FadeIn className="grid gap-5 rounded-[2rem] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.7)] px-6 py-7 shadow-[var(--shadow-soft)] sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end">
+        <FadeIn className="grid gap-5 rounded-[2rem] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.74)] px-6 py-7 shadow-[var(--shadow-soft)] sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end">
           <div className="space-y-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground-muted)]">
               Seller Setup
@@ -23,7 +23,7 @@ export default function SellerSetupPage() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+            <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--foreground-muted)]">
                 Step 1
               </p>
@@ -31,7 +31,7 @@ export default function SellerSetupPage() {
                 Nomor tujuan dari profil seller
               </p>
             </div>
-            <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+            <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--foreground-muted)]">
                 Step 2
               </p>
@@ -39,7 +39,7 @@ export default function SellerSetupPage() {
                 Susun field yang dibutuhkan customer
               </p>
             </div>
-            <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+            <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--foreground-muted)]">
                 Step 3
               </p>

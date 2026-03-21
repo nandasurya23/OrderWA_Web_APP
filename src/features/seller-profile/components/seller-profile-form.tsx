@@ -183,6 +183,18 @@ export function SellerProfileForm() {
 
         <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
           <Field>
+            <FieldLabel htmlFor="storeSlug">Public store slug</FieldLabel>
+            <FieldControl>
+              <Input id="storeSlug" readOnly value={profile.storeSlug} />
+            </FieldControl>
+            <FieldHint>
+              Link customer: /konfirmasi-pesanan/{profile.storeSlug}
+            </FieldHint>
+          </Field>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+          <Field>
             <FieldLabel htmlFor="storeDescription">Deskripsi toko singkat</FieldLabel>
             <FieldControl>
               <Textarea

@@ -35,10 +35,10 @@ export function SellerNav() {
             key={link.href}
             href={link.href}
             className={cn(
-              "group rounded-[1.4rem] border px-4 py-4 transition-[border-color,background-color,transform,box-shadow] duration-200",
+              "group rounded-[1.3rem] border px-4 py-4 transition-[border-color,background-color,transform,box-shadow] duration-200",
               isActive
-                ? "border-[var(--accent)] bg-[linear-gradient(180deg,rgba(19,60,112,0.08)_0%,rgba(19,60,112,0.02)_100%)] shadow-[0_20px_45px_rgba(19,60,112,0.12)]"
-                : "border-[var(--border)] bg-[rgba(255,255,255,0.74)] hover:border-[var(--border-strong)] hover:bg-[rgba(255,255,255,0.94)]",
+                ? "border-[var(--accent)] bg-[linear-gradient(180deg,rgba(15,58,114,0.1)_0%,rgba(15,58,114,0.02)_100%)] shadow-[0_20px_45px_rgba(15,58,114,0.12)]"
+                : "border-[var(--border)] bg-[rgba(255,255,255,0.8)] hover:border-[var(--border-strong)] hover:bg-[rgba(255,255,255,0.95)]",
             )}
           >
             <div className="flex items-start gap-3">

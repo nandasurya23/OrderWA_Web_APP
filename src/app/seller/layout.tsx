@@ -30,6 +30,25 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
             <LogoutButton />
           </div>
 
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.82)] px-4 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
+                Fokus Hari Ini
+              </p>
+              <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
+                Pastikan profil lengkap lalu generate link konfirmasi aktif.
+              </p>
+            </div>
+            <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.82)] px-4 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
+                Rule Free Plan
+              </p>
+              <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
+                1 link publik per 24 jam, expiry otomatis dari backend.
+              </p>
+            </div>
+          </div>
+
           <SellerNav />
         </SectionContainer>
       </div>

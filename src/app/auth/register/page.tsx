@@ -23,12 +23,12 @@ export default async function RegisterPage({
         <SectionContainer>
           <FadeIn>
             <AuthShell
-              description="Buat akun seller agar kamu bisa menyimpan profil toko, mengatur format order, dan membagikan link form ke customer."
+              description="Buat akun seller untuk mulai setup profile, atur order flow, dan bagikan link konfirmasi."
               eyebrow="Daftar Seller"
               footerCopy="Sudah punya akun?"
               footerHref={nextPath ? `/auth/login?next=${encodeURIComponent(nextPath)}` : "/auth/login"}
               footerLinkLabel="Masuk di sini"
-              title="Buat akun seller baru"
+              title="Daftar seller dalam satu langkah"
             >
               <RegisterForm nextPath={nextPath} />
             </AuthShell>

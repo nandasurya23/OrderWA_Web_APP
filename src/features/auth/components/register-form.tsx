@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -27,6 +28,7 @@ type RegisterFormProps = {
 
 export function RegisterForm({ nextPath }: RegisterFormProps) {
   const router = useRouter();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const redirectPath =
     nextPath && nextPath.startsWith("/") ? nextPath : "/seller/profile";
   const {
@@ -46,6 +48,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
   });
 
   const onSubmit = handleSubmit(async (values) => {
+    setSubmitError(null);
     try {
       await registerSeller({
         sellerName: values.sellerName,
@@ -63,16 +66,27 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
           setError("email", { message: error.fieldErrors.email });
         }
 
+        setSubmitError(error.message);
         toast.error(error.message);
         return;
       }
 
+      setSubmitError("Gagal membuat akun. Coba lagi.");
       toast.error("Gagal membuat akun. Coba lagi.");
     }
   });
 
   return (
     <form className="space-y-5" onSubmit={onSubmit} noValidate>
+      <div className="space-y-2">
+        <h2 className="text-3xl font-semibold leading-tight tracking-[-0.04em] text-[var(--foreground)]">
+          Daftarkan akun seller
+        </h2>
+        <p className="max-w-[44ch] text-sm leading-7 text-[var(--foreground-muted)]">
+          Setelah akun dibuat, kamu bisa lanjut ke profile dan setup flow order.
+        </p>
+      </div>
+
       <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
         <Field>
           <FieldLabel htmlFor="sellerName">Nama seller</FieldLabel>
@@ -137,6 +151,12 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
         </div>
       </div>
 
+      {submitError ? (
+        <div className="rounded-[1.2rem] border border-[var(--danger)] bg-[var(--danger-muted)] px-4 py-3 text-sm leading-6 text-[var(--danger)]">
+          {submitError}
+        </div>
+      ) : null}
+
       <Button
         size="large"
         type="submit"
@@ -146,7 +166,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
         loadingText="Sedang membuat akun..."
       >
         <UserPlus aria-hidden="true" className="h-4 w-4" />
-        Daftar
+        Buat Akun
       </Button>
     </form>
   );

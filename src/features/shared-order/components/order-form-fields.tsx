@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fadeIn } from "@/lib/motion";
+import { resolveOrderedFieldIds } from "@/features/shared-order/lib/field-order";
 import type {
   OrderFormInputValues,
   SellerOrderConfig,
@@ -53,52 +54,102 @@ export function OrderFormFields({
   errors,
   register,
 }: OrderFormFieldsProps) {
-  return (
-    <div className="space-y-6">
-      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+  function renderCustomField(customFieldId: string) {
+    const customField = config.customFields.find((field) => field.id === customFieldId);
+
+    if (!customField) {
+      return null;
+    }
+
+    const customFieldErrors =
+      (errors.customFields as Record<string, { message?: string } | undefined> | undefined) ?? {};
+    const fieldError = customFieldErrors[customField.id];
+
+    return (
+      <div
+        key={`custom:${customField.id}`}
+        className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5"
+      >
         <Field>
-          <FieldLabel htmlFor="customerName">Nama</FieldLabel>
+          <FieldLabel htmlFor={`custom-${customField.id}`}>
+            {customField.label}
+            {customField.required ? " *" : ""}
+          </FieldLabel>
           <FieldControl>
-            <div className="relative">
-              <User
-                aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-muted)]"
+            {customField.type === "textarea" ? (
+              <Textarea
+                id={`custom-${customField.id}`}
+                placeholder={customField.placeholder}
+                {...register(`customFields.${customField.id}` as const)}
               />
+            ) : (
               <Input
-                id="customerName"
-                className="pl-11"
-                placeholder="Contoh: Surya"
-                {...register("customerName")}
+                id={`custom-${customField.id}`}
+                placeholder={customField.placeholder}
+                {...register(`customFields.${customField.id}` as const)}
               />
-            </div>
+            )}
           </FieldControl>
-          <AnimatedFieldError message={errors.customerName?.message} />
+          <AnimatedFieldError message={fieldError?.message} />
         </Field>
       </div>
+    );
+  }
 
-      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
-        <Field>
-          <FieldLabel htmlFor="productName">Nama produk</FieldLabel>
-          <FieldControl>
-            <div className="relative">
-              <Package
-                aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-muted)]"
-              />
-              <Input
-                id="productName"
-                className="pl-11"
-                placeholder="Contoh: Kaos Hitam"
-                {...register("productName")}
-              />
-            </div>
-          </FieldControl>
-          <AnimatedFieldError message={errors.productName?.message} />
-        </Field>
-      </div>
+  function renderBuiltInField(fieldId: string) {
+    if (fieldId === "customerName") {
+      return (
+        <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+          <Field>
+            <FieldLabel htmlFor="customerName">Nama</FieldLabel>
+            <FieldControl>
+              <div className="relative">
+                <User
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-muted)]"
+                />
+                <Input
+                  id="customerName"
+                  className="pl-11"
+                  placeholder="Contoh: Surya"
+                  {...register("customerName")}
+                />
+              </div>
+            </FieldControl>
+            <AnimatedFieldError message={errors.customerName?.message} />
+          </Field>
+        </div>
+      );
+    }
 
-      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
-        <div className={config.showPhoneNumber ? "grid gap-4 sm:grid-cols-2" : "space-y-2"}>
+    if (fieldId === "productName") {
+      return (
+        <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+          <Field>
+            <FieldLabel htmlFor="productName">Nama produk</FieldLabel>
+            <FieldControl>
+              <div className="relative">
+                <Package
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-muted)]"
+                />
+                <Input
+                  id="productName"
+                  className="pl-11"
+                  placeholder="Contoh: Kaos Hitam"
+                  {...register("productName")}
+                />
+              </div>
+            </FieldControl>
+            <AnimatedFieldError message={errors.productName?.message} />
+          </Field>
+        </div>
+      );
+    }
+
+    if (fieldId === "quantity") {
+      return (
+        <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
           <Field>
             <FieldLabel htmlFor="quantity">Jumlah</FieldLabel>
             <FieldControl>
@@ -111,33 +162,39 @@ export function OrderFormFields({
             </FieldControl>
             <AnimatedFieldError message={errors.quantity?.message} />
           </Field>
-
-          {config.showPhoneNumber ? (
-            <Field>
-              <FieldLabel htmlFor="phoneNumber">Nomor HP</FieldLabel>
-              <FieldControl>
-                <div className="relative">
-                  <Phone
-                    aria-hidden="true"
-                    className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-muted)]"
-                  />
-                  <Input
-                    id="phoneNumber"
-                    className="pl-11"
-                    inputMode="tel"
-                    placeholder="08123456789"
-                    {...register("phoneNumber")}
-                  />
-                </div>
-              </FieldControl>
-              <AnimatedFieldError message={errors.phoneNumber?.message} />
-            </Field>
-          ) : null}
         </div>
-      </div>
+      );
+    }
 
-      {config.showAddress ? (
-        <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+    if (fieldId === "phoneNumber") {
+      return (
+        <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+          <Field>
+            <FieldLabel htmlFor="phoneNumber">Nomor HP</FieldLabel>
+            <FieldControl>
+              <div className="relative">
+                <Phone
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-muted)]"
+                />
+                <Input
+                  id="phoneNumber"
+                  className="pl-11"
+                  inputMode="tel"
+                  placeholder="08123456789"
+                  {...register("phoneNumber")}
+                />
+              </div>
+            </FieldControl>
+            <AnimatedFieldError message={errors.phoneNumber?.message} />
+          </Field>
+        </div>
+      );
+    }
+
+    if (fieldId === "address") {
+      return (
+        <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
           <Field>
             <FieldLabel htmlFor="address">Alamat</FieldLabel>
             <FieldControl>
@@ -157,10 +214,12 @@ export function OrderFormFields({
             <AnimatedFieldError message={errors.address?.message} />
           </Field>
         </div>
-      ) : null}
+      );
+    }
 
-      {config.showNote ? (
-        <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
+    if (fieldId === "note") {
+      return (
+        <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
           <Field>
             <FieldLabel htmlFor="note">Catatan</FieldLabel>
             <FieldControl>
@@ -180,7 +239,19 @@ export function OrderFormFields({
             <AnimatedFieldError message={errors.note?.message} />
           </Field>
         </div>
-      ) : null}
+      );
+    }
+
+    return null;
+  }
+
+  return (
+    <div className="space-y-6">
+      {resolveOrderedFieldIds(config).map((fieldId) =>
+        fieldId.startsWith("custom:")
+          ? renderCustomField(fieldId.replace("custom:", ""))
+          : renderBuiltInField(fieldId),
+      )}
     </div>
   );
 }

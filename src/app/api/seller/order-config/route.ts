@@ -20,6 +20,16 @@ const sellerOrderConfigSchema = z.object({
   showPhoneNumber: z.boolean(),
   showAddress: z.boolean(),
   showNote: z.boolean(),
+  customFields: z.array(
+    z.object({
+      id: z.string().trim().min(1).max(64),
+      type: z.enum(["text", "textarea"]),
+      required: z.boolean(),
+      label: z.string().trim().min(1).max(60),
+      placeholder: z.string().trim().max(120),
+    }).strict(),
+  ).max(10).default([]),
+  fieldOrder: z.array(z.string().trim().min(1).max(80)).max(30).default([]),
 }).strict();
 
 function mapConfigResponse(config: {
@@ -28,6 +38,14 @@ function mapConfigResponse(config: {
   showPhoneNumber: boolean;
   showAddress: boolean;
   showNote: boolean;
+  customFields: Array<{
+    id: string;
+    type: "text" | "textarea";
+    required: boolean;
+    label: string;
+    placeholder: string;
+  }>;
+  fieldOrder: string[];
 }) {
   return {
     config: {
@@ -59,6 +77,8 @@ export async function GET(request: NextRequest) {
           showAddress: DEFAULT_SELLER_ORDER_CONFIG.showAddress,
           showNote: DEFAULT_SELLER_ORDER_CONFIG.showNote,
           showPhoneNumber: DEFAULT_SELLER_ORDER_CONFIG.showPhoneNumber,
+          customFields: DEFAULT_SELLER_ORDER_CONFIG.customFields,
+          fieldOrder: DEFAULT_SELLER_ORDER_CONFIG.fieldOrder,
         }),
         200,
         context,
@@ -72,6 +92,8 @@ export async function GET(request: NextRequest) {
         showAddress: config.showAddress,
         showNote: config.showNote,
         showPhoneNumber: config.showPhoneNumber,
+        customFields: sellerOrderConfigSchema.shape.customFields.parse(config.customFields),
+        fieldOrder: sellerOrderConfigSchema.shape.fieldOrder.parse(config.fieldOrder),
       }),
       200,
       context,
@@ -100,6 +122,8 @@ export async function PUT(request: NextRequest) {
       showAddress: body.showAddress,
       showNote: body.showNote,
       showPhoneNumber: body.showPhoneNumber,
+      customFields: body.customFields,
+      fieldOrder: body.fieldOrder,
     });
 
     logAuditEvent({
@@ -118,6 +142,8 @@ export async function PUT(request: NextRequest) {
         showAddress: config.showAddress,
         showNote: config.showNote,
         showPhoneNumber: config.showPhoneNumber,
+        customFields: sellerOrderConfigSchema.shape.customFields.parse(config.customFields),
+        fieldOrder: sellerOrderConfigSchema.shape.fieldOrder.parse(config.fieldOrder),
       }),
       200,
       context,

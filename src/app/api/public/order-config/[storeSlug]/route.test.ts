@@ -18,6 +18,8 @@ describe("GET /api/public/order-config/[storeSlug]", () => {
     vi.mocked(resolvePublicOrderConfigByStoreSlug).mockResolvedValueOnce({
       config: {
         closingText: "Thanks",
+        customFields: [],
+        fieldOrder: [],
         openingText: "Hello",
         showAddress: true,
         showNote: true,

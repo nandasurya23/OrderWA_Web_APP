@@ -11,6 +11,14 @@ export type PublicOrderLinkData = {
   url: string;
 };
 
+export type PublicOrderLinkHistoryItem = {
+  createdAt: string;
+  expiresAt: string | null;
+  id: string;
+  status: "active" | "expired";
+  url: string;
+};
+
 type CreateOrderLinkResponse = {
   data: PublicOrderLinkData;
 };
@@ -19,6 +27,8 @@ type PublicOrderLinkStatusResponse = {
   data: {
     canGenerate: boolean;
     existingLink: PublicOrderLinkData | null;
+    history: PublicOrderLinkHistoryItem[];
+    reusableSnapshot: SellerOrderConfig | null;
     nextAvailableAt: string | null;
   };
 };

@@ -35,6 +35,7 @@ describe("POST /api/auth/login", () => {
       email: "seller@test.com",
       id: "seller-1",
       passwordHash: "hash",
+      plan: "FREE",
       sellerName: "Seller One",
       updatedAt: new Date(),
     });

@@ -23,8 +23,11 @@ export function useOrderForm(
       quantity: 1,
       address: "",
       note: "",
+      customFields: Object.fromEntries(
+        config.customFields.map((field) => [field.id, ""]),
+      ),
     }),
-    [],
+    [config.customFields],
   );
 
   return useForm<OrderFormInputValues, unknown, OrderFormValues>({

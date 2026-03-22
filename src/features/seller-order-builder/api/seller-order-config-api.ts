@@ -17,6 +17,8 @@ export async function updateSellerOrderConfig(config: SellerOrderConfig) {
   const response = await fetch("/api/seller/order-config", {
     body: JSON.stringify({
       closingText: config.closingText,
+      customFields: config.customFields,
+      fieldOrder: config.fieldOrder,
       openingText: config.openingText,
       showAddress: config.showAddress,
       showNote: config.showNote,

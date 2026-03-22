@@ -9,6 +9,8 @@ export const DEFAULT_SELLER_ORDER_CONFIG: SellerOrderConfig = {
   showPhoneNumber: true,
   showAddress: true,
   showNote: true,
+  customFields: [],
+  fieldOrder: [],
   destinationPhoneNumber: "",
 };
 
@@ -19,4 +21,5 @@ export const SELLER_PREVIEW_VALUES = {
   quantity: 2,
   address: "Denpasar",
   note: "Kirim sore",
+  customFields: {},
 };

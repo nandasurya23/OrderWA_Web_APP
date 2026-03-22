@@ -30,6 +30,20 @@ export async function findLatestPublicLinkBySellerId(
   });
 }
 
+export async function findRecentPublicLinksBySellerId(
+  sellerId: string,
+  limit = 10,
+  db: PublicOrderLinkDbClient = prisma,
+) {
+  return db.publicOrderLink.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: limit,
+    where: { sellerId },
+  });
+}
+
 export async function findPublicOrderLinkById(
   id: string,
   db: PublicOrderLinkDbClient = prisma,

@@ -1,0 +1,67 @@
+import type { SellerOrderConfig } from "@/features/shared-order/types/order.types";
+
+export const BUILT_IN_FIELD_ORDER_IDS = [
+  "customerName",
+  "productName",
+  "quantity",
+  "phoneNumber",
+  "address",
+  "note",
+] as const;
+
+export function getFieldLabelById(config: SellerOrderConfig, fieldId: string) {
+  switch (fieldId) {
+    case "customerName":
+      return "Nama";
+    case "productName":
+      return "Nama produk";
+    case "quantity":
+      return "Jumlah";
+    case "phoneNumber":
+      return "Nomor HP";
+    case "address":
+      return "Alamat";
+    case "note":
+      return "Catatan";
+    default: {
+      const customField = config.customFields.find((field) => `custom:${field.id}` === fieldId);
+      return customField?.label ?? fieldId;
+    }
+  }
+}
+
+function getVisibleFieldIds(config: SellerOrderConfig) {
+  const builtIn = [
+    "customerName",
+    "productName",
+    "quantity",
+    ...(config.showPhoneNumber ? ["phoneNumber"] : []),
+    ...(config.showAddress ? ["address"] : []),
+    ...(config.showNote ? ["note"] : []),
+  ];
+
+  const custom = config.customFields.map((field) => `custom:${field.id}`);
+
+  return [...builtIn, ...custom];
+}
+
+export function resolveOrderedFieldIds(config: SellerOrderConfig) {
+  const visible = getVisibleFieldIds(config);
+  const visibleSet = new Set(visible);
+
+  const configured = config.fieldOrder.filter((fieldId) => visibleSet.has(fieldId));
+  const uniqueConfigured: string[] = [];
+  const configuredSet = new Set<string>();
+
+  for (const fieldId of configured) {
+    if (configuredSet.has(fieldId)) {
+      continue;
+    }
+
+    configuredSet.add(fieldId);
+    uniqueConfigured.push(fieldId);
+  }
+
+  const remaining = visible.filter((fieldId) => !configuredSet.has(fieldId));
+  return [...uniqueConfigured, ...remaining];
+}

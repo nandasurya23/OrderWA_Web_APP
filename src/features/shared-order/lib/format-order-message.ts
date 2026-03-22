@@ -1,4 +1,5 @@
 import { FREE_WATERMARK_TEXT } from "@/features/shared-order/constants/order.constants";
+import { resolveOrderedFieldIds } from "@/features/shared-order/lib/field-order";
 import type {
   OrderFormValues,
   SellerOrderConfig,
@@ -13,19 +14,52 @@ export function formatOrderMessage(
   options: FormatOrderMessageOptions,
 ) {
   const { config } = options;
+  const fieldLines = resolveOrderedFieldIds(config)
+    .map((fieldId) => {
+      if (fieldId === "customerName") {
+        return `Nama: ${values.customerName.trim()}`;
+      }
+
+      if (fieldId === "productName") {
+        return `Produk: ${values.productName.trim()}`;
+      }
+
+      if (fieldId === "quantity") {
+        return `Jumlah: ${values.quantity} pcs`;
+      }
+
+      if (fieldId === "phoneNumber" && values.phoneNumber) {
+        return `No. HP: ${values.phoneNumber.trim()}`;
+      }
+
+      if (fieldId === "address" && values.address) {
+        return `Alamat: ${values.address.trim()}`;
+      }
+
+      if (fieldId === "note" && values.note) {
+        return `Catatan: ${values.note.trim()}`;
+      }
+
+      if (fieldId.startsWith("custom:")) {
+        const customId = fieldId.replace("custom:", "");
+        const customField = config.customFields.find((field) => field.id === customId);
+        const customValue = values.customFields?.[customId];
+
+        if (!customField || !customValue) {
+          return null;
+        }
+
+        return `${customField.label.trim()}: ${customValue.trim()}`;
+      }
+
+      return null;
+    })
+    .filter((line): line is string => Boolean(line));
+
   const lines = [
     config.openingText.trim(),
     "",
-    `Nama: ${values.customerName.trim()}`,
-    config.showPhoneNumber && values.phoneNumber
-      ? `No. HP: ${values.phoneNumber.trim()}`
-      : null,
-    `Produk: ${values.productName.trim()}`,
-    `Jumlah: ${values.quantity} pcs`,
-    config.showAddress && values.address
-      ? `Alamat: ${values.address.trim()}`
-      : null,
-    config.showNote && values.note ? `Catatan: ${values.note.trim()}` : null,
+    ...fieldLines,
     "",
     config.closingText.trim(),
     "",

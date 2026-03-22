@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -113,8 +114,37 @@ export function SellerProfileForm() {
   }
 
   return (
-    <Card className="rounded-[2rem]">
-      <form className="space-y-6" onSubmit={onSubmit} noValidate>
+    <section className="space-y-6">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <Button type="submit" form="seller-profile-form" size="default" disabled={!isValid || !isDirty}>
+          Aksi Utama: Simpan Profil
+        </Button>
+        <Button href="/seller/setup" size="default" variant="secondary">
+          Buka Setup Form
+        </Button>
+        <Button href="/seller" size="default" variant="ghost">
+          Lihat Dashboard
+        </Button>
+      </div>
+
+      <Card className="space-y-4 rounded-[1.8rem]">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
+              Plan Saat Ini
+            </p>
+            <p className="mt-2 inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-sm font-semibold text-[var(--foreground)]">
+              Free Plan
+            </p>
+          </div>
+          <p className="text-sm text-[var(--foreground-muted)]">
+            1 link/24 jam, watermark aktif.
+          </p>
+        </div>
+      </Card>
+
+      <Card className="rounded-[2rem]">
+      <form id="seller-profile-form" className="space-y-6" onSubmit={onSubmit} noValidate>
         <div className="space-y-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground-muted)]">
             Profil Seller
@@ -188,7 +218,13 @@ export function SellerProfileForm() {
               <Input id="storeSlug" readOnly value={profile.storeSlug} />
             </FieldControl>
             <FieldHint>
-              Link customer: /konfirmasi-pesanan/{profile.storeSlug}
+              Link customer:{" "}
+              <Link
+                href={`/konfirmasi-pesanan/${profile.storeSlug}`}
+                className="break-all font-semibold text-[var(--accent)] transition-opacity duration-200 hover:opacity-80"
+              >
+                /konfirmasi-pesanan/{profile.storeSlug}
+              </Link>
             </FieldHint>
           </Field>
         </div>
@@ -230,6 +266,7 @@ export function SellerProfileForm() {
           </p>
         </div>
       </form>
-    </Card>
+      </Card>
+    </section>
   );
 }

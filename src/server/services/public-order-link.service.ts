@@ -7,6 +7,7 @@ import {
   createPublicOrderLink,
   findPublicOrderLinkById,
   findLatestPublicLinkBySellerId,
+  findRecentPublicLinksBySellerId,
   updatePublicOrderLinkById,
 } from "@/server/repositories/public-order-link.repo";
 import {
@@ -18,8 +19,7 @@ import {
   findSellerProfileBySellerId,
   findSellerProfileByStoreSlug,
 } from "@/server/repositories/seller-profile.repo";
-
-const FREE_PLAN_LINK_WINDOW_MS = 24 * 60 * 60 * 1000;
+import { getSellerPlanPolicyBySellerId } from "@/server/services/seller-plan.service";
 
 const snapshotConfigSchema = z.object({
   openingText: z.string().trim().min(1).max(120),
@@ -27,6 +27,16 @@ const snapshotConfigSchema = z.object({
   showPhoneNumber: z.boolean(),
   showAddress: z.boolean(),
   showNote: z.boolean(),
+  customFields: z.array(
+    z.object({
+      id: z.string().trim().min(1).max(64),
+      type: z.enum(["text", "textarea"]),
+      required: z.boolean(),
+      label: z.string().trim().min(1).max(60),
+      placeholder: z.string().trim().max(120),
+    }).strict(),
+  ).max(10).default([]),
+  fieldOrder: z.array(z.string().trim().min(1).max(80)).max(30).default([]),
   destinationPhoneNumber: z.string().trim().min(10).max(20),
 }).strict();
 
@@ -70,6 +80,14 @@ function sanitizeSnapshotConfig(
     showAddress: input.showAddress,
     showNote: input.showNote,
     showPhoneNumber: input.showPhoneNumber,
+    customFields: input.customFields.map((field) => ({
+      id: field.id.trim(),
+      type: field.type,
+      required: field.required,
+      label: field.label.trim(),
+      placeholder: field.placeholder.trim(),
+    })),
+    fieldOrder: input.fieldOrder,
   };
 }
 
@@ -94,12 +112,15 @@ export async function createPublicOrderLinkWithSnapshot(input: {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${input.sellerId}))`;
     const dbNowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT now() as now`;
     const now = dbNowRows[0]?.now ?? new Date();
+    const planPolicy = await getSellerPlanPolicyBySellerId(input.sellerId);
+    const linkGenerateWindowMs = planPolicy.linkGenerateWindowMs;
+    const linkExpiryMs = planPolicy.linkExpiryMs;
 
     const latestLink = await findLatestPublicLinkBySellerId(input.sellerId, tx);
 
-    if (latestLink) {
+    if (latestLink && linkGenerateWindowMs > 0) {
       const nextAvailableAt = new Date(
-        latestLink.createdAt.getTime() + FREE_PLAN_LINK_WINDOW_MS,
+        latestLink.createdAt.getTime() + linkGenerateWindowMs,
       );
 
       if (nextAvailableAt > now) {
@@ -120,7 +141,7 @@ export async function createPublicOrderLinkWithSnapshot(input: {
       }
     }
 
-    const expiresAt = new Date(now.getTime() + FREE_PLAN_LINK_WINDOW_MS);
+    const expiresAt = new Date(now.getTime() + linkExpiryMs);
 
     const link = await createPublicOrderLink(
       {
@@ -149,8 +170,11 @@ export async function getLatestPublicOrderLinkStatus(input: {
 }) {
   const dbNowRows = await prisma.$queryRaw<Array<{ now: Date }>>`SELECT now() as now`;
   const now = dbNowRows[0]?.now ?? new Date();
+  const planPolicy = await getSellerPlanPolicyBySellerId(input.sellerId);
+  const linkGenerateWindowMs = planPolicy.linkGenerateWindowMs;
   const profile = await findSellerProfileBySellerId(input.sellerId);
   const latestLink = await findLatestPublicLinkBySellerId(input.sellerId);
+  const recentLinks = await findRecentPublicLinksBySellerId(input.sellerId, 10);
 
   if (!profile) {
     throw new HttpError("Profil seller tidak ditemukan.", {
@@ -163,16 +187,20 @@ export async function getLatestPublicOrderLinkStatus(input: {
     return {
       canGenerate: true,
       existingLink: null,
+      history: [],
+      reusableSnapshot: null,
       nextAvailableAt: null,
     };
   }
 
-  const nextAvailableAt = new Date(
-    latestLink.createdAt.getTime() + FREE_PLAN_LINK_WINDOW_MS,
-  );
+  const nextAvailableAt = new Date(latestLink.createdAt.getTime() + linkGenerateWindowMs);
+  const latestSnapshotParsed = snapshotConfigSchema.safeParse(latestLink.configSnapshotJson);
+  const reusableSnapshot = latestSnapshotParsed.success
+    ? sanitizeSnapshotConfig(latestSnapshotParsed.data)
+    : null;
 
   return {
-    canGenerate: nextAvailableAt <= now,
+    canGenerate: linkGenerateWindowMs <= 0 ? true : nextAvailableAt <= now,
     existingLink: {
       createdAt: latestLink.createdAt.toISOString(),
       expiresAt: latestLink.expiresAt?.toISOString() ?? null,
@@ -180,7 +208,18 @@ export async function getLatestPublicOrderLinkStatus(input: {
       isActive: latestLink.isActive,
       url: buildPublicOrderSlugUrl(input.origin, profile.storeSlug),
     },
-    nextAvailableAt: nextAvailableAt.toISOString(),
+    history: recentLinks.map((link) => ({
+      createdAt: link.createdAt.toISOString(),
+      expiresAt: link.expiresAt?.toISOString() ?? null,
+      id: link.id,
+      status:
+        link.isActive && !!link.expiresAt && link.expiresAt > now
+          ? "active"
+          : "expired",
+      url: buildPublicOrderSlugUrl(input.origin, profile.storeSlug),
+    })),
+    reusableSnapshot,
+    nextAvailableAt: linkGenerateWindowMs <= 0 ? null : nextAvailableAt.toISOString(),
   };
 }
 
@@ -238,6 +277,8 @@ export async function resolvePublicOrderConfigByStoreSlug(storeSlug: string) {
       showAddress: config.showAddress,
       showNote: config.showNote,
       showPhoneNumber: config.showPhoneNumber,
+      customFields: config.customFields,
+      fieldOrder: config.fieldOrder,
     },
     seller: {
       destinationPhoneNumber: config.destinationPhoneNumber,

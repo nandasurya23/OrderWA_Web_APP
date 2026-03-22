@@ -29,7 +29,7 @@ import {
 import { ApiClientError } from "@/lib/api/api-client";
 
 export function SellerOrderBuilderShell() {
-  const { config, updateConfig } = useSellerOrderConfig();
+  const { config, retrySave, saveErrorMessage, saveStatus, updateConfig } = useSellerOrderConfig();
   const { profile } = useSellerProfile();
   const [copied, setCopied] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
@@ -39,6 +39,19 @@ export function SellerOrderBuilderShell() {
   const [canGenerateLink, setCanGenerateLink] = useState(true);
   const [shareableLink, setShareableLink] = useState("");
   const [linkExpiresAt, setLinkExpiresAt] = useState<string | null>(null);
+  const [reusableSnapshot, setReusableSnapshot] = useState<
+    Pick<
+      typeof config,
+      | "openingText"
+      | "closingText"
+      | "showPhoneNumber"
+      | "showAddress"
+      | "showNote"
+      | "customFields"
+      | "fieldOrder"
+    > | null
+  >(null);
+  const [now, setNow] = useState(() => Date.now());
   const normalizedDestinationPhoneNumber = normalizePhoneNumber(
     profile?.destinationPhoneNumber,
   );
@@ -60,6 +73,29 @@ export function SellerOrderBuilderShell() {
     normalizedDestinationPhoneNumber,
   );
 
+  const cooldownRemainingLabel = useMemo(() => {
+    if (!nextAvailableAt || canGenerateLink) {
+      return "Siap sekarang";
+    }
+
+    const remainingMs = new Date(nextAvailableAt).getTime() - now;
+
+    if (remainingMs <= 0) {
+      return "Siap sekarang";
+    }
+
+    const totalSeconds = Math.ceil(remainingMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const hh = String(hours).padStart(2, "0");
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+
+    return `${hh}:${mm}:${ss}`;
+  }, [canGenerateLink, nextAvailableAt, now]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -73,6 +109,19 @@ export function SellerOrderBuilderShell() {
         setNextAvailableAt(status.nextAvailableAt);
         setShareableLink(status.existingLink?.url ?? "");
         setLinkExpiresAt(status.existingLink?.expiresAt ?? null);
+        setReusableSnapshot(
+          status.reusableSnapshot
+            ? {
+                openingText: status.reusableSnapshot.openingText,
+                closingText: status.reusableSnapshot.closingText,
+                showPhoneNumber: status.reusableSnapshot.showPhoneNumber,
+                showAddress: status.reusableSnapshot.showAddress,
+                showNote: status.reusableSnapshot.showNote,
+                customFields: status.reusableSnapshot.customFields,
+                fieldOrder: status.reusableSnapshot.fieldOrder,
+              }
+            : null,
+        );
       })
       .catch(() => {
         if (!isMounted) {
@@ -91,6 +140,20 @@ export function SellerOrderBuilderShell() {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!nextAvailableAt || canGenerateLink) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [canGenerateLink, nextAvailableAt]);
 
   async function handleCreateAndCopyLink() {
     if (!hasValidDestinationNumber || !canGenerateLink) {
@@ -132,19 +195,74 @@ export function SellerOrderBuilderShell() {
     }
   }
 
+  function handleReuseLatestSnapshot() {
+    if (!reusableSnapshot) {
+      return;
+    }
+
+    updateConfig({
+      ...config,
+      ...reusableSnapshot,
+    });
+    toast.success("Setup terakhir berhasil dipakai ulang");
+  }
+
   return (
     <section className="space-y-6">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <Button
+          onClick={() => void handleCreateAndCopyLink()}
+          disabled={!hasValidDestinationNumber || !canGenerateLink || isLoadingLinkStatus}
+          size="default"
+          isLoading={isGeneratingLink || isLoadingLinkStatus}
+          loadingText="Membuat link..."
+        >
+          Aksi Utama: Buat Link
+        </Button>
+        <Button href="/seller/profile" size="default" variant="secondary">
+          Cek Nomor Tujuan
+        </Button>
+        <Button href="/seller" size="default" variant="ghost">
+          Lihat Dashboard
+        </Button>
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] xl:items-start">
         <SellerConfigSettings
           config={config}
           destinationPhoneNumber={profile?.destinationPhoneNumber ?? ""}
           onChange={updateConfig}
         />
-        <OrderResult
-          description="Contoh ini menunjukkan bentuk pesan yang akan dibuat customer."
-          message={previewMessage}
-          title="Contoh pesan"
-        />
+        <div className="min-w-0">
+          <OrderResult
+            description="Contoh ini menunjukkan bentuk pesan yang akan dibuat customer."
+            message={previewMessage}
+            title="Contoh pesan"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-[var(--border)] bg-[rgba(244,247,251,0.9)] p-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="max-w-xl text-sm leading-6 text-[var(--foreground-muted)]" role="status" aria-live="polite">
+          {saveStatus === "saving"
+            ? "Menyimpan perubahan setup..."
+            : saveStatus === "saved"
+            ? "Perubahan setup tersimpan."
+            : saveStatus === "error"
+            ? saveErrorMessage ?? "Gagal menyimpan perubahan setup."
+            : "Perubahan setup akan tersimpan otomatis."}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          {reusableSnapshot ? (
+            <Button onClick={handleReuseLatestSnapshot} size="default" variant="secondary">
+              Pakai Setup Terakhir
+            </Button>
+          ) : null}
+          {saveStatus === "error" ? (
+            <Button onClick={retrySave} size="default" variant="secondary">
+              Coba Simpan Lagi
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <Card className="space-y-6 rounded-[2rem]">
@@ -159,13 +277,16 @@ export function SellerOrderBuilderShell() {
             Link ini sudah membawa pengaturan form yang kamu buat di halaman
             seller.
           </p>
+          <p className="text-xs text-[var(--foreground-muted)]">
+            Free plan: 1 link per 24 jam. Pro membuka limit lebih longgar.
+          </p>
         </div>
 
         <div className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.72)] p-5">
           <Field>
             <FieldLabel htmlFor="shareableLink">Link customer</FieldLabel>
             <FieldControl>
-              <Input id="shareableLink" readOnly value={shareableLink} />
+              <Input id="shareableLink" readOnly value={shareableLink} className="text-xs sm:text-sm" />
             </FieldControl>
           </Field>
         </div>
@@ -181,13 +302,16 @@ export function SellerOrderBuilderShell() {
           </div>
           <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
-              Next available
+              Sisa cooldown
             </p>
             <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-              {nextAvailableAt
-                ? new Date(nextAvailableAt).toLocaleString("id-ID")
-                : "Sekarang"}
+              {cooldownRemainingLabel}
             </p>
+            {!canGenerateLink ? (
+              <p className="mt-1 text-xs text-[var(--foreground-muted)]">
+                Limit free plan aktif. Pro akan membuka generate lebih fleksibel.
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -218,21 +342,30 @@ export function SellerOrderBuilderShell() {
           <p className="max-w-xl text-sm leading-6 text-[var(--foreground-muted)]">
             {!hasValidDestinationNumber
               ? "Isi nomor WhatsApp seller yang valid di profil agar link bisa dibuat."
-              : !canGenerateLink && nextAvailableAt
-              ? `Batas free plan aktif. Bisa buat link baru setelah ${new Date(nextAvailableAt).toLocaleString("id-ID")}.`
+              : !canGenerateLink
+              ? `Batas free plan aktif. Link baru bisa dibuat dalam ${cooldownRemainingLabel}.`
               : copied
               ? "Link token aktif sudah siap dibagikan."
               : "Setiap klik akan membuat link token baru dengan snapshot terbaru."}
           </p>
         </div>
         {planLimitMessage ? (
-          <p className="text-sm text-[var(--foreground-muted)]">{planLimitMessage}</p>
+          <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+            <p className="text-sm text-[var(--foreground-muted)]">{planLimitMessage}</p>
+          </div>
         ) : null}
         {linkExpiresAt ? (
           <p className="text-sm text-[var(--foreground-muted)]">
             Link aktif berlaku sampai {new Date(linkExpiresAt).toLocaleString("id-ID")}.
           </p>
         ) : null}
+        <p className="text-sm text-[var(--foreground-muted)]">
+          Free plan menampilkan watermark `(dibuat dengan OrderWA)` pada pesan.
+          Pro akan mendukung tanpa watermark.
+        </p>
+        <p className="text-sm text-[var(--foreground-muted)]">
+          Fitur premium terkunci: multi-link aktif dan advanced customization.
+        </p>
       </Card>
     </section>
   );

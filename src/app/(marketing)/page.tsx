@@ -1,4 +1,14 @@
-import { ArrowRight, Check, ClipboardList, Link2, MessageSquareText, Store } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  Check,
+  CircleAlert,
+  Layers,
+  Lock,
+  MessageSquareText,
+  Sparkles,
+  Timer,
+} from "lucide-react";
 
 import { FadeIn } from "@/components/motion/fade-in";
 import { StaggerContainer } from "@/components/motion/stagger-container";
@@ -7,204 +17,311 @@ import { AppHeader } from "@/components/shared/app-header";
 import { SectionContainer } from "@/components/shared/section-container";
 import { Button } from "@/components/ui/button";
 
-const quickWins = [
-  "Setup seller sekali, pakai berulang",
-  "Link customer langsung ke form aktif",
-  "Pesan WhatsApp lebih siap diproses",
+const painPoints = [
+  "Chat order sering acak dan detail penting hilang.",
+  "Seller harus menanyakan hal yang sama berulang kali.",
+  "Lead masuk, tapi format pesan tidak siap diproses cepat.",
+];
+
+const featureHighlights = [
+  {
+    title: "Seller setup yang reusable",
+    description:
+      "Template starter, style pesan, urutan field, dan custom field disimpan untuk dipakai ulang.",
+    icon: Layers,
+  },
+  {
+    title: "Public form yang lebih rapi",
+    description:
+      "Customer isi form sesuai struktur seller, lalu pesan WhatsApp dibentuk otomatis sesuai urutan field.",
+    icon: MessageSquareText,
+  },
+  {
+    title: "Semi-AI direction yang praktis",
+    description:
+      "Saat ini rule-based helper sudah ada. Arah berikutnya: asistensi seller yang lebih pintar dan tetap terkontrol.",
+    icon: Bot,
+  },
 ];
 
 const howItWorks = [
   {
     step: "01",
-    title: "Seller setup flow order",
-    description: "Atur teks pembuka, penutup, dan field yang ingin ditampilkan.",
-    icon: Store,
+    title: "Setup sekali di workspace seller",
+    description: "Atur template, style pesan, dan struktur field order.",
   },
   {
     step: "02",
-    title: "Bagikan link konfirmasi",
-    description: "Link publik siap dibagikan ke customer tanpa setup tambahan.",
-    icon: Link2,
+    title: "Bagikan link form ke customer",
+    description: "Customer masuk ke form publik yang selalu mengikuti setup terbaru.",
   },
   {
     step: "03",
-    title: "Customer kirim order rapi",
-    description: "Customer isi form, preview pesan, lalu kirim ke WhatsApp seller.",
-    icon: MessageSquareText,
+    title: "Terima pesan WhatsApp yang siap proses",
+    description: "Output lebih konsisten sehingga follow-up dan operasional jadi lebih cepat.",
   },
 ];
 
-const featureCards = [
-  {
-    title: "Seller workspace yang fokus",
-    description: "Pengaturan profile, config, dan share link ada di alur yang sama.",
-  },
-  {
-    title: "Public form yang aman",
-    description: "Link publik punya validasi aktif/expired sehingga flow lebih terjaga.",
-  },
-  {
-    title: "CTA langsung ke tindakan utama",
-    description: "User langsung tahu langkah lanjut: setup, bagikan, lalu proses order.",
-  },
+const freePlanNotes = [
+  "1 link publik per 24 jam",
+  "Watermark OrderWA pada pesan",
+  "Fondasi setup + custom field dasar",
+];
+
+const proDirectionNotes = [
+  "Tanpa watermark",
+  "Multi-link aktif dan limit lebih longgar",
+  "Advanced customization dan seller assistant yang lebih kuat",
 ];
 
 export default function MarketingPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
-      <main className="flex-1 py-8 sm:py-12">
+      <main className="flex-1 py-12 sm:py-16">
         <SectionContainer>
-          <StaggerContainer className="space-y-14 sm:space-y-20">
-            <section className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:items-stretch">
-              <FadeIn className="rounded-[2.5rem] border border-[var(--border-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(243,248,255,0.84)_100%)] px-6 py-7 shadow-[var(--shadow-strong)] sm:px-8 sm:py-9">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
+          <StaggerContainer className="space-y-20 sm:space-y-24">
+            <section className="grid gap-7 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:items-stretch">
+              <FadeIn className="ui-hero-panel px-7 py-8 sm:px-10 sm:py-11">
+                <p className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 ui-kicker tracking-[0.16em]">
+                  <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
                   OrderWA for Seller
                 </p>
-                <h1 className="mt-4 max-w-[15ch] text-5xl font-semibold leading-[0.95] tracking-[-0.07em] text-[var(--foreground)] sm:text-6xl">
-                  Konfirmasi pesanan yang lebih profesional.
+                <h1 className="ui-title mt-6 max-w-[15ch] text-5xl font-semibold leading-[0.94] tracking-[-0.07em] sm:text-6xl">
+                  Ubah chat order jadi alur yang lebih jelas dan siap proses.
                 </h1>
-                <p className="mt-5 max-w-[var(--max-text-measure)] text-base leading-8 text-[var(--foreground-muted)] sm:text-lg">
-                  Ganti flow chat acak dengan alur order yang lebih jelas: seller setup,
-                  customer isi form, lalu pesan siap kirim ke WhatsApp.
+                <p className="mt-6 max-w-[58ch] text-base leading-8 text-[var(--foreground-muted)] sm:text-lg">
+                  OrderWA membantu seller merapikan order flow dari setup hingga pesan WhatsApp final.
+                  Fokusnya bukan sekadar form, tapi sistem kerja order yang konsisten untuk tim seller.
                 </p>
 
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                   <Button href="/auth/register" size="large">
                     Mulai Gratis
                     <ArrowRight aria-hidden="true" className="h-4 w-4" />
                   </Button>
-                  <Button href="/seller/setup" size="large" variant="secondary">
-                    Lihat Seller Setup
+                  <Button href="/seller" size="large" variant="secondary">
+                    Lihat Seller Dashboard
                   </Button>
                 </div>
 
-                <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                  {quickWins.map((item) => (
+                <div className="mt-9 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+                    <p className="ui-kicker tracking-[0.16em]">
+                      Fokus
+                    </p>
+                    <p className="mt-2 text-sm text-[var(--foreground-muted)]">Seller-first workflow</p>
+                  </div>
+                  <div className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+                    <p className="ui-kicker tracking-[0.16em]">
+                      Plan
+                    </p>
+                    <p className="mt-2 text-sm text-[var(--foreground-muted)]">Free plan jelas, upgrade terarah</p>
+                  </div>
+                  <div className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+                    <p className="ui-kicker tracking-[0.16em]">
+                      Direction
+                    </p>
+                    <p className="mt-2 text-sm text-[var(--foreground-muted)]">Smarter semi-AI seller assistant</p>
+                  </div>
+                </div>
+              </FadeIn>
+
+              <FadeIn className="rounded-[2rem] border border-[rgba(16,35,60,0.1)] bg-[linear-gradient(180deg,#123d74_0%,#0e315a_100%)] p-6 text-[var(--accent-foreground)] shadow-[0_28px_74px_rgba(15,58,114,0.3)] sm:p-8">
+                <div className="space-y-4">
+                  <div className="rounded-[1.2rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[rgba(246,249,255,0.7)]">
+                      New Seller Value
+                    </p>
+                    <p className="mt-2 text-lg font-semibold">Bukan cuma bikin link, tapi bikin sistem order.</p>
+                  </div>
+                  <div className="rounded-[1.2rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-4">
+                    <p className="text-sm font-semibold">Yang didapat seller</p>
+                    <div className="mt-3 space-y-2 text-sm text-[rgba(246,249,255,0.86)]">
+                      <p className="rounded-lg border border-[rgba(255,255,255,0.16)] px-3 py-2">Setup reusable: starter + style + urutan field</p>
+                      <p className="rounded-lg border border-[rgba(255,255,255,0.16)] px-3 py-2">Dashboard: status link, cooldown, dan riwayat</p>
+                      <p className="rounded-lg border border-[rgba(255,255,255,0.16)] px-3 py-2">Output order lebih konsisten untuk operasional harian</p>
+                    </div>
+                  </div>
+                  <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.92)] px-4 py-4 text-[var(--foreground)]">
+                    <p className="text-sm font-semibold">Kenapa ini penting</p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--foreground-muted)]">
+                      Seller tidak lagi mulai dari chat kosong di tiap customer. Struktur order jadi aset kerja yang bisa dipakai berulang.
+                    </p>
+                  </div>
+                </div>
+              </FadeIn>
+            </section>
+
+            <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-7">
+              <FadeIn className="ui-surface-panel p-7 sm:p-8">
+                <p className="ui-kicker tracking-[0.18em]">
+                  Problem
+                </p>
+                <h2 className="mt-3 text-[2.25rem] font-semibold leading-[1.03] tracking-[-0.05em] text-[var(--foreground)]">
+                  Pain points seller yang sering bikin proses lambat.
+                </h2>
+                <div className="mt-5 space-y-3">
+                  {painPoints.map((point) => (
                     <div
-                      key={item}
-                      className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.9)] px-4 py-4"
+                      key={point}
+                      className="flex items-start gap-3 rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
                     >
-                      <p className="text-sm leading-6 text-[var(--foreground-muted)]">{item}</p>
+                      <CircleAlert aria-hidden="true" className="mt-0.5 h-4 w-4 text-[var(--danger)]" />
+                      <p className="text-sm leading-6 text-[var(--foreground-muted)]">{point}</p>
                     </div>
                   ))}
                 </div>
               </FadeIn>
 
-              <FadeIn className="rounded-[2.5rem] border border-[rgba(16,35,60,0.08)] bg-[linear-gradient(180deg,#123d74_0%,#0d2d54_100%)] p-5 text-[var(--accent-foreground)] shadow-[0_26px_74px_rgba(15,58,114,0.3)] sm:p-6">
-                <div className="grid gap-4">
-                  <div className="rounded-[1.35rem] border border-[rgba(255,255,255,0.14)] bg-[rgba(255,255,255,0.08)] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[rgba(246,249,255,0.68)]">
-                      Product Preview
-                    </p>
-                    <p className="mt-2 text-lg font-semibold">Seller to Customer Flow</p>
+              <FadeIn className="ui-surface-panel p-7 sm:p-8">
+                <p className="ui-kicker tracking-[0.18em]">
+                  Why Seller
+                </p>
+                <h2 className="mt-3 text-[2.25rem] font-semibold leading-[1.03] tracking-[-0.05em] text-[var(--foreground)]">
+                  Value yang langsung terasa di sisi seller.
+                </h2>
+                <div className="mt-5 space-y-3">
+                  <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+                    <p className="text-sm font-semibold text-[var(--foreground)]">Lebih cepat memproses order</p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--foreground-muted)]">Data masuk dalam format yang sudah siap dipakai.</p>
                   </div>
-
-                  <div className="rounded-[1.35rem] border border-[rgba(255,255,255,0.14)] bg-[rgba(255,255,255,0.08)] p-4">
-                    <p className="text-sm font-semibold">Seller Setup</p>
-                    <div className="mt-3 space-y-2 text-sm text-[rgba(246,249,255,0.82)]">
-                      <p className="rounded-lg border border-[rgba(255,255,255,0.14)] px-3 py-2">Atur field order</p>
-                      <p className="rounded-lg border border-[rgba(255,255,255,0.14)] px-3 py-2">Generate link customer</p>
-                    </div>
+                  <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+                    <p className="text-sm font-semibold text-[var(--foreground)]">Lebih konsisten lintas customer</p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--foreground-muted)]">Template dan style membantu jaga standar komunikasi.</p>
                   </div>
-
-                  <div className="rounded-[1.35rem] border border-[var(--border)] bg-[rgba(255,255,255,0.94)] p-4 text-[var(--foreground)]">
-                    <p className="text-sm font-semibold">Customer Result</p>
-                    <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-sm leading-6">
-                      <p>Halo kak, saya mau order:</p>
-                      <p>Nama: Surya</p>
-                      <p>Produk: Kaos Hitam</p>
-                      <p>Jumlah: 2 pcs</p>
-                    </div>
+                  <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+                    <p className="text-sm font-semibold text-[var(--foreground)]">Lebih siap scale</p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--foreground-muted)]">Flow order tidak bergantung pada improvisasi chat manual.</p>
                   </div>
                 </div>
               </FadeIn>
             </section>
 
-            <section className="grid gap-5 lg:grid-cols-3">
-              {howItWorks.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <FadeIn
-                    key={item.step}
-                    className="rounded-[1.9rem] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.82)] p-6 shadow-[var(--shadow-soft)]"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
-                        Step {item.step}
-                      </span>
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]">
-                        <Icon aria-hidden="true" className="h-4 w-4 text-[var(--accent)]" />
-                      </div>
-                    </div>
-                    <h2 className="mt-4 text-2xl font-semibold leading-tight tracking-[-0.03em] text-[var(--foreground)]">
-                      {item.title}
-                    </h2>
-                    <p className="mt-3 text-sm leading-7 text-[var(--foreground-muted)]">
-                      {item.description}
-                    </p>
-                  </FadeIn>
-                );
-              })}
-            </section>
-
-            <section className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start">
-              <div className="space-y-4 rounded-[2.2rem] border border-[var(--border-soft)] bg-[rgba(255,255,255,0.82)] p-7 shadow-[var(--shadow-soft)] sm:p-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
+            <section className="space-y-7">
+              <FadeIn>
+                <p className="ui-kicker tracking-[0.18em]">
                   Feature Highlights
                 </p>
-                <h2 className="max-w-[18ch] text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-[var(--foreground)]">
-                  Fondasi order flow yang siap dipakai harian.
+                <h2 className="mt-3 max-w-[18ch] text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.05em] text-[var(--foreground)]">
+                  Fondasi produk baru yang lebih jelas untuk seller.
                 </h2>
-                <div className="space-y-3 pt-2">
-                  {featureCards.map((card) => (
-                    <div
-                      key={card.title}
-                      className="rounded-[1.15rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4"
+              </FadeIn>
+              <div className="grid gap-5 lg:grid-cols-3 lg:gap-6">
+                {featureHighlights.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <FadeIn
+                      key={item.title}
+                      className="ui-surface-panel p-6"
                     >
-                      <p className="text-sm font-semibold text-[var(--foreground)]">{card.title}</p>
-                      <p className="mt-2 text-sm leading-6 text-[var(--foreground-muted)]">
-                        {card.description}
-                      </p>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)]">
+                        <Icon aria-hidden="true" className="h-5 w-5 text-[var(--accent)]" />
+                      </div>
+                      <h3 className="mt-4 text-2xl font-semibold leading-tight tracking-[-0.03em] text-[var(--foreground)]">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-[var(--foreground-muted)]">{item.description}</p>
+                    </FadeIn>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="space-y-7">
+              <FadeIn>
+                <p className="ui-kicker tracking-[0.18em]">
+                  How It Works
+                </p>
+                <h2 className="mt-3 max-w-[18ch] text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.05em] text-[var(--foreground)]">
+                  Dari setup seller sampai pesan WhatsApp siap kirim.
+                </h2>
+              </FadeIn>
+              <div className="grid gap-5 lg:grid-cols-3 lg:gap-6">
+                {howItWorks.map((item) => (
+                  <FadeIn
+                    key={item.step}
+                    className="ui-surface-panel p-6"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--foreground-muted)]">
+                      Step {item.step}
+                    </p>
+                    <h3 className="mt-3 text-2xl font-semibold leading-tight tracking-[-0.03em] text-[var(--foreground)]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-7 text-[var(--foreground-muted)]">{item.description}</p>
+                  </FadeIn>
+                ))}
+              </div>
+            </section>
+
+            <section className="grid gap-6 lg:grid-cols-2 lg:gap-7">
+              <FadeIn className="ui-surface-panel p-7 sm:p-8">
+                <p className="ui-kicker tracking-[0.18em]">
+                  Free Plan
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-[-0.04em] text-[var(--foreground)]">
+                  Cukup untuk mulai, jelas batasnya.
+                </h2>
+                <div className="mt-5 space-y-2">
+                  {freePlanNotes.map((item) => (
+                    <div key={item} className="flex items-start gap-2 text-sm text-[var(--foreground-muted)]">
+                      <Check aria-hidden="true" className="mt-0.5 h-4 w-4 text-[var(--accent)]" />
+                      <span>{item}</span>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              <FadeIn className="rounded-[2.2rem] border border-[rgba(16,35,60,0.08)] bg-[linear-gradient(180deg,#123d74_0%,#0e315a_100%)] p-7 text-[var(--accent-foreground)] shadow-[0_24px_64px_rgba(15,58,114,0.28)] sm:p-8 lg:sticky lg:top-24">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[rgba(246,249,255,0.68)]">
-                  Closing CTA
+                <p className="mt-5 text-sm leading-7 text-[var(--foreground-muted)]">
+                  Batas free plan dibuat agar seller bisa mencoba alur end-to-end dengan ekspektasi yang transparan.
                 </p>
-                <h3 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em]">
-                  Mulai dari setup, bukan dari chat manual.
-                </h3>
-                <p className="mt-4 text-sm leading-7 text-[rgba(246,249,255,0.8)]">
-                  Pakai workspace seller untuk menyiapkan flow order yang konsisten dan
-                  lebih mudah diproses.
-                </p>
+              </FadeIn>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                  <Button href="/auth/register" size="large">
-                    Mulai Gratis
-                  </Button>
-                  <Button href="/seller/setup" size="large" variant="secondary">
-                    Coba Setup
-                  </Button>
+              <FadeIn className="rounded-[2rem] border border-[rgba(16,35,60,0.1)] bg-[linear-gradient(180deg,#123d74_0%,#0e315a_100%)] p-7 text-[var(--accent-foreground)] shadow-[0_24px_64px_rgba(15,58,114,0.28)] sm:p-8">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[rgba(246,249,255,0.7)]">
+                  Pro Direction
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-[-0.04em]">
+                  Upgrade untuk seller yang butuh skala dan otomatisasi lebih.
+                </h2>
+                <div className="mt-5 space-y-2">
+                  {proDirectionNotes.map((item) => (
+                    <div key={item} className="flex items-start gap-2 text-sm text-[rgba(246,249,255,0.86)]">
+                      <Lock aria-hidden="true" className="mt-0.5 h-4 w-4" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
                 </div>
+                <p className="mt-5 text-sm leading-7 text-[rgba(246,249,255,0.82)]">
+                  Arahnya jelas: dari rule-based helper saat ini menuju seller assistant yang lebih pintar dan tetap terkontrol.
+                </p>
+              </FadeIn>
+            </section>
 
-                <div className="mt-6 space-y-2">
-                  <div className="flex items-start gap-2 text-sm">
-                    <Check aria-hidden="true" className="mt-0.5 h-4 w-4" />
-                    <span>Setup cepat tanpa ubah flow utama bisnis.</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <Check aria-hidden="true" className="mt-0.5 h-4 w-4" />
-                    <span>Link publik terkontrol dan bisa dibagikan langsung.</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <Check aria-hidden="true" className="mt-0.5 h-4 w-4" />
-                    <span>Pesan order lebih jelas sebelum dikirim ke WhatsApp.</span>
-                  </div>
+            <section className="ui-hero-panel px-7 py-9 sm:px-11 sm:py-11">
+              <FadeIn className="grid gap-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+                <div>
+                  <p className="ui-kicker tracking-[0.18em]">
+                    CTA
+                  </p>
+                  <h2 className="ui-title mt-3 max-w-[16ch] text-4xl font-semibold leading-[1.01] sm:text-5xl">
+                    Bangun sistem order seller yang lebih rapi mulai hari ini.
+                  </h2>
+                  <p className="mt-4 max-w-[var(--max-text-measure)] text-sm leading-7 text-[var(--foreground-muted)] sm:text-base">
+                    Mulai dari free plan, validasi flow, lalu lanjutkan ke level berikutnya saat bisnismu butuh lebih.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  <Button href="/auth/register" size="large" className="w-full">
+                    Mulai Gratis
+                    <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                  </Button>
+                  <Button href="/seller/setup" size="large" variant="secondary" className="w-full">
+                    Lihat Setup Seller
+                  </Button>
+                  <Button href="/seller" size="large" variant="ghost" className="w-full">
+                    <Timer aria-hidden="true" className="h-4 w-4" />
+                    Lihat Dashboard & Cooldown
+                  </Button>
                 </div>
               </FadeIn>
             </section>

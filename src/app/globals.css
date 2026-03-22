@@ -24,6 +24,9 @@
   --radius-lg: 1.5rem;
   --field-height: 3rem;
   --max-text-measure: 62ch;
+  --panel-radius-hero: 2rem;
+  --panel-radius: 1.75rem;
+  --panel-radius-inner: 1.1rem;
 }
 
 * {
@@ -117,4 +120,38 @@ button:disabled {
     linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 22%),
     radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.78), transparent 16%);
   z-index: -1;
+}
+
+.ui-hero-panel {
+  border-radius: var(--panel-radius-hero);
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(243, 248, 255, 0.9) 100%);
+  box-shadow: var(--shadow-strong);
+}
+
+.ui-surface-panel {
+  border-radius: var(--panel-radius);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-soft);
+}
+
+.ui-surface-inner {
+  border-radius: var(--panel-radius-inner);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.ui-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--foreground-muted);
+}
+
+.ui-title {
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+  color: var(--foreground);
 }

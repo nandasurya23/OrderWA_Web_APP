@@ -15,6 +15,15 @@ const optionalPhoneNumber = optionalTrimmedString.refine(
 );
 
 export function createOrderFormSchema(config: SellerOrderConfig) {
+  const customFieldShape = Object.fromEntries(
+    config.customFields.map((field) => [
+      field.id,
+      field.required
+        ? z.string().trim().min(1, `${field.label.trim()} wajib diisi.`)
+        : optionalTrimmedString,
+    ]),
+  );
+
   return z.object({
     customerName: z
       .string()
@@ -32,5 +41,6 @@ export function createOrderFormSchema(config: SellerOrderConfig) {
       ? z.string().trim().min(5, "Alamat minimal 5 karakter.")
       : optionalTrimmedString,
     note: config.showNote ? optionalTrimmedString : z.undefined().optional(),
+    customFields: z.object(customFieldShape),
   });
 }

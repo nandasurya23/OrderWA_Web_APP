@@ -84,6 +84,8 @@ export async function POST(request: NextRequest) {
 
     await createSellerOrderConfig({
       closingText: DEFAULT_SELLER_ORDER_CONFIG.closingText,
+      customFields: DEFAULT_SELLER_ORDER_CONFIG.customFields,
+      fieldOrder: DEFAULT_SELLER_ORDER_CONFIG.fieldOrder,
       openingText: DEFAULT_SELLER_ORDER_CONFIG.openingText,
       sellerId: account.id,
       showAddress: DEFAULT_SELLER_ORDER_CONFIG.showAddress,

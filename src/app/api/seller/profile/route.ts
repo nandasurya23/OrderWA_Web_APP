@@ -105,10 +105,21 @@ export async function PUT(request: NextRequest) {
     }
 
     const nextStoreName = body.storeName.trim();
-    const nextStoreSlug = await generateUniqueStoreSlug({
-      sellerId,
-      storeName: nextStoreName,
-    });
+    const currentProfile = await findSellerProfileBySellerId(sellerId);
+
+    if (!currentProfile) {
+      throw new HttpError("Profil seller belum tersedia", {
+        code: "NOT_FOUND",
+        status: 404,
+      });
+    }
+
+    const nextStoreSlug = currentProfile.storeSlug
+      ? currentProfile.storeSlug
+      : await generateUniqueStoreSlug({
+          sellerId,
+          storeName: nextStoreName,
+        });
 
     const [account, profile] = await Promise.all([
       updateSellerAccountIdentity(sellerId, {

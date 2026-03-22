@@ -19,6 +19,16 @@ const createOrderLinkSchema = z.object({
     showPhoneNumber: z.boolean(),
     showAddress: z.boolean(),
     showNote: z.boolean(),
+    customFields: z.array(
+      z.object({
+        id: z.string(),
+        type: z.enum(["text", "textarea"]),
+        required: z.boolean(),
+        label: z.string(),
+        placeholder: z.string(),
+      }).strict(),
+    ).max(10).default([]),
+    fieldOrder: z.array(z.string().trim().min(1).max(80)).max(30).default([]),
     destinationPhoneNumber: z.string(),
   }).strict(),
 }).strict();

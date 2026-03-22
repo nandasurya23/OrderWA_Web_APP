@@ -1,6 +1,7 @@
 import { AppFooter } from "@/components/shared/app-footer";
 import { AppHeader } from "@/components/shared/app-header";
 import { SectionContainer } from "@/components/shared/section-container";
+import { Button } from "@/components/ui/button";
 import { SellerNav } from "@/components/shared/seller-nav";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 
@@ -12,47 +13,52 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
-      <div className="border-b border-[var(--border-soft)] bg-[rgba(255,255,255,0.48)]">
-        <SectionContainer className="flex flex-col gap-5 py-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground-muted)]">
-                Seller Workspace
-              </p>
-              <h1 className="text-3xl font-semibold leading-tight tracking-[-0.05em] text-[var(--foreground)] sm:text-4xl">
-                Kelola profil, format order, dan link customer dalam satu alur.
-              </h1>
-              <p className="text-sm leading-7 text-[var(--foreground-muted)] sm:text-base">
-                Lengkapi nomor tujuan, atur bentuk pesan, lalu bagikan link form
-                yang siap dipakai customer.
-              </p>
-            </div>
-            <LogoutButton />
+      <main className="flex-1 py-6 sm:py-8 lg:py-10">
+        <SectionContainer>
+          <div className="grid gap-5 lg:gap-6 xl:grid-cols-[minmax(0,290px)_minmax(0,1fr)] xl:items-start">
+            <aside className="space-y-4 xl:sticky xl:top-24">
+              <div className="ui-hero-panel p-5">
+                <p className="ui-kicker">
+                  Seller Workspace
+                </p>
+                <h2 className="ui-title mt-3 text-2xl font-semibold">
+                  Pusat kerja order seller.
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--foreground-muted)]">
+                  Fokus pada produktivitas harian: setup, link, dan monitoring dalam satu workspace.
+                </p>
+                <div className="ui-surface-inner mt-5 px-3 py-3">
+                  <p className="ui-kicker tracking-[0.14em]">
+                    Plan Saat Ini
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">Free Plan</p>
+                  <p className="mt-1 text-xs text-[var(--foreground-muted)]">
+                    1 link publik per 24 jam.
+                  </p>
+                  <div className="mt-3">
+                    <Button href="/seller/upgrade" size="default" className="w-full">
+                      Upgrade ke Pro
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <div className="ui-surface-panel p-4">
+                <SellerNav />
+              </div>
+              <div className="ui-surface-panel flex flex-col gap-2 p-4">
+                <Button href="/seller/setup" size="default" className="w-full">
+                  Aksi Utama: Setup Form
+                </Button>
+                <Button href="/seller/profile" size="default" variant="secondary" className="w-full">
+                  Lengkapi Profil Seller
+                </Button>
+                <LogoutButton />
+              </div>
+            </aside>
+            <div className="min-w-0 space-y-6">{children}</div>
           </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.82)] px-4 py-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
-                Fokus Hari Ini
-              </p>
-              <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-                Pastikan profil lengkap lalu generate link konfirmasi aktif.
-              </p>
-            </div>
-            <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(255,255,255,0.82)] px-4 py-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
-                Rule Free Plan
-              </p>
-              <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-                1 link publik per 24 jam, expiry otomatis dari backend.
-              </p>
-            </div>
-          </div>
-
-          <SellerNav />
         </SectionContainer>
-      </div>
-      <main className="flex-1">{children}</main>
+      </main>
       <AppFooter />
     </div>
   );

@@ -14,7 +14,7 @@ export function LogoutButton() {
     try {
       await logoutSeller();
       toast.success("Berhasil keluar");
-      router.push("/auth/login");
+      router.push("/auth/seller/login");
       router.refresh();
     } catch {
       toast.error("Gagal keluar. Coba lagi.");

@@ -57,15 +57,29 @@ export function SellerOrderBuilderShell() {
   );
 
   const previewMessage = useMemo(
-    () =>
-      formatOrderMessage(SELLER_PREVIEW_VALUES, {
+    () => {
+      const previewCustomFields = Object.fromEntries(
+        config.customFields.map((field) => [
+          field.id,
+          field.placeholder.trim() || `Contoh ${field.label.trim()}`,
+        ]),
+      );
+
+      return formatOrderMessage(
+        {
+          ...SELLER_PREVIEW_VALUES,
+          customFields: previewCustomFields,
+        },
+        {
         config: {
           ...config,
           destinationPhoneNumber:
             normalizedDestinationPhoneNumber ||
             DEFAULT_SELLER_ORDER_CONFIG.destinationPhoneNumber,
         },
-      }),
+      },
+      );
+    },
     [config, normalizedDestinationPhoneNumber],
   );
 
@@ -366,6 +380,11 @@ export function SellerOrderBuilderShell() {
         <p className="text-sm text-[var(--foreground-muted)]">
           Fitur premium terkunci: multi-link aktif dan advanced customization.
         </p>
+        <div>
+          <Button href="/seller/upgrade" size="default" variant="secondary">
+            Lihat Opsi Pro
+          </Button>
+        </div>
       </Card>
     </section>
   );

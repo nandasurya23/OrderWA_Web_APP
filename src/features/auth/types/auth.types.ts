@@ -7,8 +7,11 @@ export type AuthSeller = {
   sellerId: string;
   sellerName: string;
   email: string;
-  storeName: string;
-  destinationPhoneNumber: string;
+  role: "SELLER" | "ADMIN";
+  storeName: string | null;
+  destinationPhoneNumber: string | null;
+  plan: string;
+  proValidUntil: string | null;
 };
 
 export type RegisterSellerInput = {
@@ -25,6 +28,7 @@ export type LoginSellerInput = {
 
 export type AuthResponse = {
   seller: AuthSeller;
+  redirectPath?: string;
 };
 
 export type StoredSellerAccount = {

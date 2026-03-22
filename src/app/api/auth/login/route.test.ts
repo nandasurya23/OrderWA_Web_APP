@@ -36,6 +36,7 @@ describe("POST /api/auth/login", () => {
       id: "seller-1",
       passwordHash: "hash",
       plan: "FREE",
+      proValidUntil: null,
       sellerName: "Seller One",
       updatedAt: new Date(),
     });
@@ -69,5 +70,37 @@ describe("POST /api/auth/login", () => {
     expect(response.status).toBe(200);
     expect(payload.seller.email).toBe("seller@test.com");
     expect(setSessionCookie).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns 403 when expectedRole is ADMIN but account is seller", async () => {
+    vi.mocked(findSellerAccountByEmail).mockResolvedValueOnce({
+      createdAt: new Date(),
+      email: "seller@test.com",
+      id: "seller-1",
+      passwordHash: "hash",
+      plan: "FREE",
+      proValidUntil: null,
+      role: "SELLER",
+      sellerName: "Seller One",
+      updatedAt: new Date(),
+    });
+    vi.mocked(verifyPassword).mockReturnValueOnce(true);
+
+    const request = new NextRequest("http://localhost/api/auth/login", {
+      body: JSON.stringify({
+        email: "seller@test.com",
+        expectedRole: "ADMIN",
+        password: "secret123",
+      }),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+
+    const response = await POST(request);
+    const payload = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(payload.error.code).toBe("AUTH_ROLE_MISMATCH");
+    expect(setSessionCookie).not.toHaveBeenCalled();
   });
 });

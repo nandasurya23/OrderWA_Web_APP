@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SellerPlanBadge } from "@/components/shared/seller-plan-badge";
 import {
   getPublicOrderLinkStatus,
   type PublicOrderLinkData,
@@ -152,19 +153,10 @@ export function SellerDashboardShell() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
               Plan Saat Ini
             </p>
-            <p className="mt-2 inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-sm font-semibold text-[var(--foreground)]">
-              Free Plan
-            </p>
-            <p className="mt-2 text-xs text-[var(--foreground-muted)]">
-              Watermark aktif di free plan. Pro mendukung tanpa watermark.
-            </p>
-            <p className="mt-1 text-xs text-[var(--foreground-muted)]">
-              Terkunci untuk pro: multi-link aktif & advanced customization.
-            </p>
+            <div className="mt-2">
+              <SellerPlanBadge />
+            </div>
           </div>
-          <Button href="/seller/setup" size="default" variant="secondary">
-            Buka Setup Form
-          </Button>
         </div>
       </Card>
 

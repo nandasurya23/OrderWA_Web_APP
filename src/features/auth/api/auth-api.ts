@@ -24,9 +24,15 @@ export async function registerSeller(
 
 export async function loginSeller(
   input: LoginSellerInput,
+  options?: {
+    expectedRole?: "SELLER" | "ADMIN";
+  },
 ): Promise<AuthResponse> {
   const response = await fetch("/api/auth/login", {
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      expectedRole: options?.expectedRole,
+    }),
     credentials: "include",
     headers: {
       "content-type": "application/json",
@@ -39,7 +45,13 @@ export async function loginSeller(
 
 export async function logoutSeller() {
   const response = await fetch("/api/auth/logout", {
+    body: JSON.stringify({
+      role: "SELLER",
+    }),
     credentials: "include",
+    headers: {
+      "content-type": "application/json",
+    },
     method: "POST",
   });
 

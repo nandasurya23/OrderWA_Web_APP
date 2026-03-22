@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SellerPlanBadge } from "@/components/shared/seller-plan-badge";
 import {
   Field,
   FieldControl,
@@ -133,13 +134,10 @@ export function SellerProfileForm() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
               Plan Saat Ini
             </p>
-            <p className="mt-2 inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-sm font-semibold text-[var(--foreground)]">
-              Free Plan
-            </p>
+            <div className="mt-2">
+              <SellerPlanBadge />
+            </div>
           </div>
-          <p className="text-sm text-[var(--foreground-muted)]">
-            1 link/24 jam, watermark aktif.
-          </p>
         </div>
       </Card>
 

@@ -13,6 +13,7 @@ import {
   upsertSellerOrderConfig,
 } from "@/server/repositories/seller-order-config.repo";
 import { enforceRateLimit } from "@/server/security/rate-limit";
+import { syncLatestPublicLinkSnapshotForSellerConfig } from "@/server/services/public-order-link.service";
 
 const sellerOrderConfigSchema = z.object({
   openingText: z.string().trim().min(1).max(120),
@@ -124,6 +125,18 @@ export async function PUT(request: NextRequest) {
       showPhoneNumber: body.showPhoneNumber,
       customFields: body.customFields,
       fieldOrder: body.fieldOrder,
+    });
+    await syncLatestPublicLinkSnapshotForSellerConfig({
+      sellerId,
+      config: {
+        closingText: config.closingText,
+        openingText: config.openingText,
+        showAddress: config.showAddress,
+        showNote: config.showNote,
+        showPhoneNumber: config.showPhoneNumber,
+        customFields: sellerOrderConfigSchema.shape.customFields.parse(config.customFields),
+        fieldOrder: sellerOrderConfigSchema.shape.fieldOrder.parse(config.fieldOrder),
+      },
     });
 
     logAuditEvent({

@@ -26,7 +26,7 @@ export default async function RegisterPage({
               description="Buat akun seller untuk mulai setup profile, atur order flow, dan bagikan link konfirmasi."
               eyebrow="Daftar Seller"
               footerCopy="Sudah punya akun?"
-              footerHref={nextPath ? `/auth/login?next=${encodeURIComponent(nextPath)}` : "/auth/login"}
+              footerHref={nextPath ? `/auth/seller/login?next=${encodeURIComponent(nextPath)}` : "/auth/seller/login"}
               footerLinkLabel="Masuk di sini"
               title="Daftar seller dalam satu langkah"
             >

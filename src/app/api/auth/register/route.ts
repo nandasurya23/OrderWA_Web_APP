@@ -20,6 +20,7 @@ import {
 import { createSellerOrderConfig } from "@/server/repositories/seller-order-config.repo";
 import { createSellerProfile } from "@/server/repositories/seller-profile.repo";
 import { enforceRateLimit } from "@/server/security/rate-limit";
+import { ACCOUNT_ROLE } from "@/server/auth/roles";
 
 const registerRequestSchema = z
   .object({
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest) {
     const account = await createSellerAccount({
       email,
       passwordHash: hashPassword(body.password),
+      role: ACCOUNT_ROLE.SELLER,
       sellerName: body.sellerName.trim(),
     });
     const initialStoreName = account.sellerName;
@@ -98,13 +100,16 @@ export async function POST(request: NextRequest) {
       seller: {
         destinationPhoneNumber: "",
         email: account.email,
+        plan: account.plan,
+        proValidUntil: account.proValidUntil?.toISOString() ?? null,
+        role: ACCOUNT_ROLE.SELLER,
         sellerId: account.id,
         sellerName: account.sellerName,
         storeName: account.sellerName,
       },
     }, 200, context);
 
-    setSessionCookie(response, session.rawToken, session.expiresAt);
+    setSessionCookie(response, session.rawToken, session.expiresAt, ACCOUNT_ROLE.SELLER);
     logAuditEvent({
       action: "auth.register.success",
       metadata: {

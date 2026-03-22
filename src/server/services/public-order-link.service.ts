@@ -328,3 +328,49 @@ export async function patchPublicOrderLinkById(input: {
     isActive: parsedBody.isActive,
   });
 }
+
+export async function syncLatestPublicLinkSnapshotForSellerConfig(input: {
+  sellerId: string;
+  config: {
+    openingText: string;
+    closingText: string;
+    showPhoneNumber: boolean;
+    showAddress: boolean;
+    showNote: boolean;
+    customFields: Array<{
+      id: string;
+      type: "text" | "textarea";
+      required: boolean;
+      label: string;
+      placeholder: string;
+    }>;
+    fieldOrder: string[];
+  };
+}) {
+  const latestLink = await findLatestPublicLinkBySellerId(input.sellerId);
+
+  if (!latestLink) {
+    return;
+  }
+
+  const latestSnapshot = snapshotConfigSchema.safeParse(latestLink.configSnapshotJson);
+
+  if (!latestSnapshot.success) {
+    return;
+  }
+
+  const nextSnapshot = sanitizeSnapshotConfig({
+    ...latestSnapshot.data,
+    openingText: input.config.openingText,
+    closingText: input.config.closingText,
+    showPhoneNumber: input.config.showPhoneNumber,
+    showAddress: input.config.showAddress,
+    showNote: input.config.showNote,
+    customFields: input.config.customFields,
+    fieldOrder: input.config.fieldOrder,
+  });
+
+  await updatePublicOrderLinkById(latestLink.id, {
+    configSnapshotJson: nextSnapshot,
+  });
+}

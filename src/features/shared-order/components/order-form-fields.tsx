@@ -19,7 +19,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fadeIn } from "@/lib/motion";
-import { resolveOrderedFieldIds } from "@/features/shared-order/lib/field-order";
+import {
+  type BuiltInFieldId,
+  type ResolvedCustomField,
+  resolveOrderedFields,
+} from "@/features/shared-order/lib/field-order";
 import type {
   OrderFormInputValues,
   SellerOrderConfig,
@@ -54,39 +58,33 @@ export function OrderFormFields({
   errors,
   register,
 }: OrderFormFieldsProps) {
-  function renderCustomField(customFieldId: string) {
-    const customField = config.customFields.find((field) => field.id === customFieldId);
-
-    if (!customField) {
-      return null;
-    }
-
+  function renderCustomField(customField: ResolvedCustomField) {
     const customFieldErrors =
       (errors.customFields as Record<string, { message?: string } | undefined> | undefined) ?? {};
-    const fieldError = customFieldErrors[customField.id];
+    const fieldError = customFieldErrors[customField.fieldId];
 
     return (
       <div
-        key={`custom:${customField.id}`}
+        key={customField.id}
         className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5"
       >
         <Field>
-          <FieldLabel htmlFor={`custom-${customField.id}`}>
+          <FieldLabel htmlFor={`custom-${customField.fieldId}`}>
             {customField.label}
             {customField.required ? " *" : ""}
           </FieldLabel>
           <FieldControl>
-            {customField.type === "textarea" ? (
+            {customField.inputType === "textarea" ? (
               <Textarea
-                id={`custom-${customField.id}`}
+                id={`custom-${customField.fieldId}`}
                 placeholder={customField.placeholder}
-                {...register(`customFields.${customField.id}` as const)}
+                {...register(`customFields.${customField.fieldId}` as const)}
               />
             ) : (
               <Input
-                id={`custom-${customField.id}`}
+                id={`custom-${customField.fieldId}`}
                 placeholder={customField.placeholder}
-                {...register(`customFields.${customField.id}` as const)}
+                {...register(`customFields.${customField.fieldId}` as const)}
               />
             )}
           </FieldControl>
@@ -96,7 +94,7 @@ export function OrderFormFields({
     );
   }
 
-  function renderBuiltInField(fieldId: string) {
+  function renderBuiltInField(fieldId: BuiltInFieldId) {
     if (fieldId === "customerName") {
       return (
         <div key={fieldId} className="rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.68)] p-5">
@@ -247,10 +245,10 @@ export function OrderFormFields({
 
   return (
     <div className="space-y-6">
-      {resolveOrderedFieldIds(config).map((fieldId) =>
-        fieldId.startsWith("custom:")
-          ? renderCustomField(fieldId.replace("custom:", ""))
-          : renderBuiltInField(fieldId),
+      {resolveOrderedFields(config).map((field) =>
+        field.kind === "custom"
+          ? renderCustomField(field)
+          : renderBuiltInField(field.id),
       )}
     </div>
   );

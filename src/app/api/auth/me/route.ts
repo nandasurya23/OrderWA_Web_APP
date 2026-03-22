@@ -6,6 +6,8 @@ import { ok, toErrorResponse } from "@/server/http/response";
 import { findSellerAccountById } from "@/server/repositories/seller-account.repo";
 import { findSellerProfileBySellerId } from "@/server/repositories/seller-profile.repo";
 import { enforceRateLimit } from "@/server/security/rate-limit";
+import { resolveEffectiveSellerPlan } from "@/server/config/seller-plan";
+import { ACCOUNT_ROLE, resolveAccountRole } from "@/server/auth/roles";
 
 export async function GET(request: NextRequest) {
   const context = createRequestContext(request);
@@ -18,28 +20,40 @@ export async function GET(request: NextRequest) {
       windowMs: 60 * 1000,
     });
 
-    const sellerId = await getSessionSellerId(request);
+    const sellerId = await getSessionSellerId(request, ACCOUNT_ROLE.SELLER);
 
     if (!sellerId) {
       return ok({ seller: null }, 200, context);
     }
 
-    const [account, profile] = await Promise.all([
-      findSellerAccountById(sellerId),
-      findSellerProfileBySellerId(sellerId),
-    ]);
+    const account = await findSellerAccountById(sellerId);
+    if (!account) {
+      return ok({ seller: null }, 200, context);
+    }
 
-    if (!account || !profile) {
+    const role = resolveAccountRole(account.role);
+    const profile =
+      role === ACCOUNT_ROLE.SELLER
+        ? await findSellerProfileBySellerId(sellerId)
+        : null;
+
+    if (role === ACCOUNT_ROLE.SELLER && !profile) {
       return ok({ seller: null }, 200, context);
     }
 
     return ok({
       seller: {
-        destinationPhoneNumber: profile.destinationPhoneNumber,
+        destinationPhoneNumber: profile?.destinationPhoneNumber ?? null,
         email: account.email,
+        plan: resolveEffectiveSellerPlan({
+          plan: account.plan,
+          proValidUntil: account.proValidUntil,
+        }),
+        proValidUntil: account.proValidUntil?.toISOString() ?? null,
+        role,
         sellerId: account.id,
         sellerName: account.sellerName,
-        storeName: profile.storeName,
+        storeName: profile?.storeName ?? null,
       },
     }, 200, context);
   } catch (error) {

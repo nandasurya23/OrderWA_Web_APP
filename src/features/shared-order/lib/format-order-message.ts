@@ -1,5 +1,5 @@
 import { FREE_WATERMARK_TEXT } from "@/features/shared-order/constants/order.constants";
-import { resolveOrderedFieldIds } from "@/features/shared-order/lib/field-order";
+import { resolveOrderedFields } from "@/features/shared-order/lib/field-order";
 import type {
   OrderFormValues,
   SellerOrderConfig,
@@ -14,42 +14,40 @@ export function formatOrderMessage(
   options: FormatOrderMessageOptions,
 ) {
   const { config } = options;
-  const fieldLines = resolveOrderedFieldIds(config)
-    .map((fieldId) => {
-      if (fieldId === "customerName") {
-        return `Nama: ${values.customerName.trim()}`;
-      }
+  const fieldLines = resolveOrderedFields(config)
+    .map((field) => {
+      if (field.kind === "custom") {
+        const customValue = values.customFields?.[field.fieldId];
 
-      if (fieldId === "productName") {
-        return `Produk: ${values.productName.trim()}`;
-      }
-
-      if (fieldId === "quantity") {
-        return `Jumlah: ${values.quantity} pcs`;
-      }
-
-      if (fieldId === "phoneNumber" && values.phoneNumber) {
-        return `No. HP: ${values.phoneNumber.trim()}`;
-      }
-
-      if (fieldId === "address" && values.address) {
-        return `Alamat: ${values.address.trim()}`;
-      }
-
-      if (fieldId === "note" && values.note) {
-        return `Catatan: ${values.note.trim()}`;
-      }
-
-      if (fieldId.startsWith("custom:")) {
-        const customId = fieldId.replace("custom:", "");
-        const customField = config.customFields.find((field) => field.id === customId);
-        const customValue = values.customFields?.[customId];
-
-        if (!customField || !customValue) {
+        if (!customValue) {
           return null;
         }
 
-        return `${customField.label.trim()}: ${customValue.trim()}`;
+        return `${field.label.trim()}: ${customValue.trim()}`;
+      }
+
+      if (field.id === "customerName") {
+        return `Nama: ${values.customerName.trim()}`;
+      }
+
+      if (field.id === "productName") {
+        return `Produk: ${values.productName.trim()}`;
+      }
+
+      if (field.id === "quantity") {
+        return `Jumlah: ${values.quantity} pcs`;
+      }
+
+      if (field.id === "phoneNumber" && values.phoneNumber) {
+        return `No. HP: ${values.phoneNumber.trim()}`;
+      }
+
+      if (field.id === "address" && values.address) {
+        return `Alamat: ${values.address.trim()}`;
+      }
+
+      if (field.id === "note" && values.note) {
+        return `Catatan: ${values.note.trim()}`;
       }
 
       return null;

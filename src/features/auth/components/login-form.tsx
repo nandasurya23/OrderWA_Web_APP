@@ -25,13 +25,18 @@ import {
 
 type LoginFormProps = {
   nextPath?: string;
+  mode?: "seller" | "admin";
 };
 
-export function LoginForm({ nextPath }: LoginFormProps) {
+export function LoginForm({ nextPath, mode = "seller" }: LoginFormProps) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const redirectPath =
-    nextPath && nextPath.startsWith("/") ? nextPath : "/seller/setup";
+    nextPath && nextPath.startsWith("/")
+      ? nextPath
+      : mode === "admin"
+      ? "/admin"
+      : "/seller/setup";
   const {
     formState: { errors, isSubmitting, isValid },
     handleSubmit,
@@ -49,9 +54,17 @@ export function LoginForm({ nextPath }: LoginFormProps) {
   const onSubmit = handleSubmit(async (values) => {
     setSubmitError(null);
     try {
-      await loginSeller(values);
+      const payload = await loginSeller(values, {
+        expectedRole: mode === "admin" ? "ADMIN" : "SELLER",
+      });
       toast.success("Berhasil masuk");
-      router.push(redirectPath);
+      const nextRedirect =
+        nextPath && nextPath.startsWith("/")
+          ? nextPath
+          : payload.redirectPath && payload.redirectPath.startsWith("/")
+          ? payload.redirectPath
+          : redirectPath;
+      router.push(nextRedirect);
       router.refresh();
     } catch (error) {
       if (error instanceof ApiClientError) {
@@ -73,10 +86,12 @@ export function LoginForm({ nextPath }: LoginFormProps) {
     <form className="space-y-5" onSubmit={onSubmit} noValidate>
       <div className="space-y-2">
         <h2 className="text-3xl font-semibold leading-tight tracking-[-0.04em] text-[var(--foreground)]">
-          Masuk ke workspace seller
+          {mode === "admin" ? "Masuk ke workspace admin" : "Masuk ke workspace seller"}
         </h2>
         <p className="max-w-[42ch] text-sm leading-7 text-[var(--foreground-muted)]">
-          Gunakan email dan kata sandi yang sudah terdaftar untuk lanjut ke setup.
+          {mode === "admin"
+            ? "Gunakan akun admin untuk akses review request upgrade dan kontrol admin."
+            : "Gunakan email dan kata sandi yang sudah terdaftar untuk lanjut ke setup."}
         </p>
       </div>
 
@@ -99,12 +114,14 @@ export function LoginForm({ nextPath }: LoginFormProps) {
         <Field>
           <div className="flex items-center justify-between gap-3">
             <FieldLabel htmlFor="password">Kata sandi</FieldLabel>
-            <Link
-              href="/auth/register"
-              className="text-sm text-[var(--foreground-muted)] transition-colors duration-200 hover:text-[var(--accent)]"
-            >
-              Buat akun baru
-            </Link>
+            {mode === "seller" ? (
+              <Link
+                href="/auth/register"
+                className="text-sm text-[var(--foreground-muted)] transition-colors duration-200 hover:text-[var(--accent)]"
+              >
+                Buat akun baru
+              </Link>
+            ) : null}
           </div>
           <FieldControl>
             <Input
@@ -134,7 +151,7 @@ export function LoginForm({ nextPath }: LoginFormProps) {
         loadingText="Sedang masuk..."
       >
         <LogIn aria-hidden="true" className="h-4 w-4" />
-        Masuk ke Dashboard
+        {mode === "admin" ? "Masuk ke Admin" : "Masuk ke Dashboard"}
       </Button>
     </form>
   );

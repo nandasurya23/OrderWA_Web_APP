@@ -1,15 +1,40 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { AppFooter } from "@/components/shared/app-footer";
 import { AppHeader } from "@/components/shared/app-header";
+import { SellerPlanBadge } from "@/components/shared/seller-plan-badge";
 import { SectionContainer } from "@/components/shared/section-container";
 import { Button } from "@/components/ui/button";
 import { SellerNav } from "@/components/shared/seller-nav";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { resolveAccountRole } from "@/server/auth/roles";
+import {
+  AUTH_SELLER_SESSION_COOKIE_NAME,
+  getSessionSellerIdFromRawToken,
+} from "@/server/auth/session";
+import { findSellerAccountById } from "@/server/repositories/seller-account.repo";
 
 type SellerLayoutProps = Readonly<{
   children: React.ReactNode;
 }>;
 
-export default function SellerLayout({ children }: SellerLayoutProps) {
+export default async function SellerLayout({ children }: SellerLayoutProps) {
+  const cookieStore = await cookies();
+  const rawToken = cookieStore.get(AUTH_SELLER_SESSION_COOKIE_NAME)?.value;
+  const accountId = await getSessionSellerIdFromRawToken(rawToken);
+
+  if (!accountId) {
+    redirect("/auth/seller/login?next=%2Fseller");
+  }
+
+  const account = await findSellerAccountById(accountId);
+  const role = resolveAccountRole(account?.role);
+
+  if (role !== "SELLER") {
+    redirect("/auth/admin/login?next=%2Fadmin");
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
@@ -31,14 +56,8 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
                   <p className="ui-kicker tracking-[0.14em]">
                     Plan Saat Ini
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">Free Plan</p>
-                  <p className="mt-1 text-xs text-[var(--foreground-muted)]">
-                    1 link publik per 24 jam.
-                  </p>
-                  <div className="mt-3">
-                    <Button href="/seller/upgrade" size="default" className="w-full">
-                      Upgrade ke Pro
-                    </Button>
+                  <div className="mt-1">
+                    <SellerPlanBadge />
                   </div>
                 </div>
               </div>

@@ -66,6 +66,7 @@ describe("POST /api/auth/register", () => {
       id: "seller-1",
       passwordHash: "hashed-password",
       plan: "FREE",
+      proValidUntil: null,
       sellerName: "Seller One",
       updatedAt: new Date(),
     });

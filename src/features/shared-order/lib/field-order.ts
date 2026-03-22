@@ -9,6 +9,26 @@ export const BUILT_IN_FIELD_ORDER_IDS = [
   "note",
 ] as const;
 
+export type BuiltInFieldId = (typeof BUILT_IN_FIELD_ORDER_IDS)[number];
+
+export type ResolvedBuiltInField = {
+  id: BuiltInFieldId;
+  kind: "builtIn";
+  label: string;
+};
+
+export type ResolvedCustomField = {
+  id: string;
+  kind: "custom";
+  fieldId: string;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  inputType: "text" | "textarea";
+};
+
+export type ResolvedFieldDefinition = ResolvedBuiltInField | ResolvedCustomField;
+
 export function getFieldLabelById(config: SellerOrderConfig, fieldId: string) {
   switch (fieldId) {
     case "customerName":
@@ -64,4 +84,39 @@ export function resolveOrderedFieldIds(config: SellerOrderConfig) {
 
   const remaining = visible.filter((fieldId) => !configuredSet.has(fieldId));
   return [...uniqueConfigured, ...remaining];
+}
+
+export function resolveOrderedFields(config: SellerOrderConfig): ResolvedFieldDefinition[] {
+  return resolveOrderedFieldIds(config)
+    .map((fieldId): ResolvedFieldDefinition | null => {
+      if (fieldId.startsWith("custom:")) {
+        const customId = fieldId.replace("custom:", "");
+        const customField = config.customFields.find((field) => field.id === customId);
+
+        if (!customField) {
+          return null;
+        }
+
+        return {
+          id: fieldId,
+          kind: "custom",
+          fieldId: customField.id,
+          inputType: customField.type,
+          label: customField.label,
+          placeholder: customField.placeholder,
+          required: customField.required,
+        };
+      }
+
+      if (!BUILT_IN_FIELD_ORDER_IDS.includes(fieldId as BuiltInFieldId)) {
+        return null;
+      }
+
+      return {
+        id: fieldId as BuiltInFieldId,
+        kind: "builtIn",
+        label: getFieldLabelById(config, fieldId),
+      };
+    })
+    .filter((field): field is ResolvedFieldDefinition => Boolean(field));
 }

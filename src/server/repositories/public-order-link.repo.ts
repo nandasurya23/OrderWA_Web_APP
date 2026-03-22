@@ -85,6 +85,7 @@ export async function findPublicOrderLinkByTokenWithSeller(
 export async function updatePublicOrderLinkById(
   id: string,
   input: {
+    configSnapshotJson?: Prisma.InputJsonValue;
     expiresAt?: Date | null;
     isActive?: boolean;
   },

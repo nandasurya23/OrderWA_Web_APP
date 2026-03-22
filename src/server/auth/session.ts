@@ -4,8 +4,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/server/db/prisma";
+import { ACCOUNT_ROLE, type AccountRole, resolveAccountRole } from "@/server/auth/roles";
 
-export const AUTH_SESSION_COOKIE_NAME = "orderwa_seller_session";
+export const AUTH_SELLER_SESSION_COOKIE_NAME = "orderwa_seller_session";
+export const AUTH_ADMIN_SESSION_COOKIE_NAME = "orderwa_admin_session";
 const AUTH_SESSION_TTL_DAYS = 30;
 
 function hashToken(rawToken: string) {
@@ -16,7 +18,13 @@ function createRawToken() {
   return randomBytes(32).toString("base64url");
 }
 
-export async function createSellerSession(sellerId: string) {
+function getSessionCookieName(role: AccountRole) {
+  return role === ACCOUNT_ROLE.ADMIN
+    ? AUTH_ADMIN_SESSION_COOKIE_NAME
+    : AUTH_SELLER_SESSION_COOKIE_NAME;
+}
+
+export async function createAccountSession(accountId: string) {
   const rawToken = createRawToken();
   const tokenHash = hashToken(rawToken);
   const expiresAt = new Date(
@@ -25,7 +33,7 @@ export async function createSellerSession(sellerId: string) {
 
   await prisma.authSession.create({
     data: {
-      sellerId,
+      sellerId: accountId,
       tokenHash,
       expiresAt,
     },
@@ -37,8 +45,17 @@ export async function createSellerSession(sellerId: string) {
   };
 }
 
-export function setSessionCookie(response: NextResponse, rawToken: string, expiresAt: Date) {
-  response.cookies.set(AUTH_SESSION_COOKIE_NAME, rawToken, {
+export async function createSellerSession(sellerId: string) {
+  return createAccountSession(sellerId);
+}
+
+export function setSessionCookie(
+  response: NextResponse,
+  rawToken: string,
+  expiresAt: Date,
+  role: AccountRole = ACCOUNT_ROLE.SELLER,
+) {
+  response.cookies.set(getSessionCookieName(role), rawToken, {
     expires: expiresAt,
     httpOnly: true,
     path: "/",
@@ -47,8 +64,11 @@ export function setSessionCookie(response: NextResponse, rawToken: string, expir
   });
 }
 
-export function clearSessionCookie(response: NextResponse) {
-  response.cookies.set(AUTH_SESSION_COOKIE_NAME, "", {
+export function clearSessionCookie(
+  response: NextResponse,
+  role: AccountRole = ACCOUNT_ROLE.SELLER,
+) {
+  response.cookies.set(getSessionCookieName(role), "", {
     expires: new Date(0),
     httpOnly: true,
     path: "/",
@@ -57,9 +77,22 @@ export function clearSessionCookie(response: NextResponse) {
   });
 }
 
-export async function getSessionSellerId(request: NextRequest) {
-  const rawToken = request.cookies.get(AUTH_SESSION_COOKIE_NAME)?.value;
+export function getRoleSessionCookieValue(
+  request: NextRequest,
+  role: AccountRole,
+) {
+  return request.cookies.get(getSessionCookieName(role))?.value;
+}
 
+export async function getSessionSellerId(
+  request: NextRequest,
+  role: AccountRole = ACCOUNT_ROLE.SELLER,
+) {
+  const rawToken = getRoleSessionCookieValue(request, role);
+  return getSessionSellerIdFromRawToken(rawToken);
+}
+
+export async function getSessionSellerIdFromRawToken(rawToken?: string) {
   if (!rawToken) {
     return null;
   }
@@ -107,4 +140,8 @@ export async function revokeSessionByCookieToken(rawToken?: string) {
       tokenHash,
     },
   });
+}
+
+export function resolveRequestedRole(input?: string | null): AccountRole {
+  return resolveAccountRole(input);
 }

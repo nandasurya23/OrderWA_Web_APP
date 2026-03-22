@@ -12,7 +12,9 @@ model SellerAccount {
   sellerName   String
   email        String   @unique
   passwordHash String
+  role         String   @default("SELLER")
   plan         String   @default("FREE")
+  proValidUntil DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -20,9 +22,29 @@ model SellerAccount {
   orderConfig SellerOrderConfig?
   sessions    AuthSession[]
   publicLinks PublicOrderLink[]
+  upgradeRequests SellerUpgradeRequest[]
 
   @@map("seller_accounts")
   @@index([createdAt], map: "idx_seller_accounts_created_at")
+}
+
+model SellerUpgradeRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  sellerId    String   @db.Uuid
+  planCode    String
+  priceAmount Int
+  currency    String   @default("IDR")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewNote  String?
+
+  seller SellerAccount @relation(fields: [sellerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("seller_upgrade_requests")
+  @@index([sellerId], map: "idx_seller_upgrade_requests_seller_id")
+  @@index([status], map: "idx_seller_upgrade_requests_status")
+  @@index([sellerId, status], map: "idx_seller_upgrade_requests_seller_status")
 }
 
 model SellerProfile {
